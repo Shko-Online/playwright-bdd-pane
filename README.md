@@ -46,12 +46,44 @@ npm run dev        # http://localhost:5173/host.html  (viewer in a cross-origin 
 npm run typecheck
 ```
 
-## Package and publish
+## Releases
 
-1. Set `publisher` in [vss-extension.json](vss-extension.json) to your Marketplace publisher ID ([create one](https://marketplace.visualstudio.com/manage/createpublisher)).
-2. `npm run package` builds `out/<publisher>.playwright-bdd-pane-<version>.vsix`.
-   `npm run package:dev` builds a private `-dev` variant you can install side by side.
-3. Upload the `.vsix` at <https://marketplace.visualstudio.com/manage>, share it with your organization, and install it there.
-   Or use `npx tfx extension publish --vsix out/*.vsix --share-with <org> --token <PAT>`.
+Releases are automatic. Every push to `main` runs [.github/workflows/release.yml](.github/workflows/release.yml), where [semantic-release](https://semantic-release.gitbook.io/) picks the next version from the commit messages since the last `v*` tag:
 
-Every new upload needs a higher extension `version`. When the task changes, also bump `version` in [task.json](tasks/PublishPlaywrightBddReport/task.json), or agents will keep their cached copy.
+| Commit message | Release |
+| --- | --- |
+| `fix: …` | patch (1.2.**3**) |
+| `feat: …` | minor (1.**3**.0) |
+| `feat!: …`, or a `BREAKING CHANGE:` footer | major (**2**.0.0) |
+| `docs:`, `chore:`, `ci:`, `refactor:`, `test:`, `build:` … | no release |
+
+For a release, the workflow then:
+
+1. checks that Marketplace Trusted Publishing works, before anything is tagged;
+2. packages the `.vsix`, stamping the version into the manifest and `task.json`;
+3. publishes it to the Visual Studio Marketplace;
+4. creates the `vX.Y.Z` tag and a GitHub Release with notes and the `.vsix` attached.
+
+Versions live only in tags. The `0.0.0` in [vss-extension.json](vss-extension.json) and [task.json](tasks/PublishPlaywrightBddReport/task.json) is a placeholder, and nothing is committed back to `main`.
+
+The task version always matches the extension version. A major release therefore moves the task to a new major, and pipelines must change `PublishPlaywrightBddReport@1` to `@2`. Use `!` / `BREAKING CHANGE` only for changes that really break existing pipelines.
+
+### Marketplace authentication
+
+Publishing uses [Trusted Publishing](https://learn.microsoft.com/azure/devops/extend/publish/overview#publish-with-oidc-trusted-publishing), so there is no PAT or secret. The workflow exchanges its GitHub OIDC token for a credential that lasts 15 minutes ([scripts/release/marketplace.mjs](scripts/release/marketplace.mjs)). This is the same exchange `vsce publish --oidc` makes.
+
+It requires a policy on the `shko-online` publisher (Marketplace → publisher → **Trusted Publishing**):
+
+| Field | Value |
+| --- | --- |
+| Repository owner | `Shko-Online` |
+| Repository | `playwright-bdd-pane` |
+| Workflow | `release.yml` |
+| Environment | `marketplace` |
+
+### Manual packaging
+
+```sh
+npm run package -- --version 1.2.3   # out/shko-online.playwright-bdd-pane-1.2.3.vsix (public)
+npm run package:dev -- --version 1.2.3   # private "-dev" variant, for testing in one organization
+```
