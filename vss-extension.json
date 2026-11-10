@@ -1,0 +1,47 @@
+{
+  "manifestVersion": 1,
+  "id": "playwright-bdd-pane",
+  "publisher": "shko-online",
+  "version": "1.0.0",
+  "name": "Playwright BDD Report",
+  "description": "Publish playwright-bdd test reports from your pipelines and review them in a tab of the run, right in the browser.",
+  "public": false,
+  "categories": ["Azure Pipelines"],
+  "tags": ["playwright", "playwright-bdd", "bdd", "cucumber", "gherkin", "test report", "testing"],
+  "targets": [{ "id": "Microsoft.VisualStudio.Services" }],
+  "icons": { "default": "images/icon.png" },
+  "content": {
+    "details": { "path": "overview.md" },
+    "license": { "path": "LICENSE" }
+  },
+  "links": {
+    "repository": { "uri": "https://github.com/Shko-Online/playwright-bdd-pane" },
+    "support": { "uri": "https://github.com/Shko-Online/playwright-bdd-pane/issues" }
+  },
+  "repository": { "type": "git", "uri": "https://github.com/Shko-Online/playwright-bdd-pane" },
+  "scopes": ["vso.build"],
+  "files": [
+    { "path": "build/web", "addressable": true, "packagePath": "web" },
+    { "path": "build/tasks/PublishPlaywrightBddReport" },
+    { "path": "images", "addressable": true }
+  ],
+  "contributions": [
+    {
+      "id": "publish-playwright-bdd-report-task",
+      "type": "ms.vss-distributed-task.task",
+      "targets": ["ms.vss-distributed-task.tasks"],
+      "properties": { "name": "build/tasks/PublishPlaywrightBddReport" }
+    },
+    {
+      "id": "playwright-bdd-build-tab",
+      "type": "ms.vss-build-web.build-results-view",
+      "description": "Shows playwright-bdd reports published by the Publish Playwright BDD report task.",
+      "targets": ["ms.vss-build-web.build-results-view"],
+      "properties": {
+        "name": "Playwright BDD",
+        "uri": "web/tab.html",
+        "supportsTasks": ["3295db5e-8ae6-4b91-baf5-fd8be0d10d21"]
+      }
+    }
+  ]
+}

@@ -1,0 +1,24 @@
+{
+  "name": "playwright-bdd-pane",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Azure DevOps extension: publish playwright-bdd reports and view them in a build results tab.",
+  "license": "MIT",
+  "scripts": {
+    "build": "node scripts/build.mjs",
+    "typecheck": "tsc -p tsconfig.json && tsc -p tasks/PublishPlaywrightBddReport/tsconfig.json",
+    "icons": "node scripts/make-icons.mjs",
+    "fixtures": "node scripts/build.mjs --dev && node scripts/make-fixtures.mjs",
+    "dev": "node scripts/build.mjs --dev && node scripts/dev-server.mjs",
+    "package": "npm run build && tfx extension create --manifest-globs vss-extension.json --output-path out",
+    "package:dev": "npm run build && tfx extension create --manifest-globs vss-extension.json --overrides-file vss-extension.dev.json --output-path out"
+  },
+  "devDependencies": {
+    "azure-devops-extension-api": "^5.279.1",
+    "azure-devops-extension-sdk": "^4.2.0",
+    "esbuild": "^0.28.2",
+    "jszip": "^3.10.2",
+    "tfx-cli": "^0.24.2",
+    "typescript": "^5.9.3"
+  }
+}

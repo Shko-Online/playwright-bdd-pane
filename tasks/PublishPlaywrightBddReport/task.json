@@ -1,0 +1,67 @@
+{
+  "$schema": "https://raw.githubusercontent.com/Microsoft/azure-pipelines-task-lib/master/tasks.schema.json",
+  "id": "3295db5e-8ae6-4b91-baf5-fd8be0d10d21",
+  "name": "PublishPlaywrightBddReport",
+  "friendlyName": "Publish Playwright BDD report",
+  "description": "Publish a playwright-bdd HTML report (Cucumber or Playwright) so it can be reviewed in the \"Playwright BDD\" tab of the pipeline run.",
+  "helpMarkDown": "Packs the report folder and attaches it to the run. Open the run and select the **Playwright BDD** tab to browse it, with no download needed. Add `condition: succeededOrFailed()` so the report is also published when tests fail.",
+  "category": "Test",
+  "visibility": ["Build"],
+  "author": "Shko Online",
+  "version": {
+    "Major": 1,
+    "Minor": 0,
+    "Patch": 0
+  },
+  "minimumAgentVersion": "2.144.0",
+  "instanceNameFormat": "Publish Playwright BDD report",
+  "inputs": [
+    {
+      "name": "reportDir",
+      "type": "filePath",
+      "label": "Report folder",
+      "defaultValue": "cucumber-report",
+      "required": true,
+      "helpMarkDown": "Folder that contains the HTML report, e.g. `cucumber-report` (playwright-bdd `cucumberReporter('html')`) or `playwright-report` (Playwright HTML reporter). Relative paths are resolved against `$(System.DefaultWorkingDirectory)`."
+    },
+    {
+      "name": "entryFile",
+      "type": "string",
+      "label": "Entry HTML file",
+      "defaultValue": "index.html",
+      "required": false,
+      "helpMarkDown": "HTML file inside the report folder to open first. If it does not exist, the first `.html` file in the folder root is used."
+    },
+    {
+      "name": "reportName",
+      "type": "string",
+      "label": "Report name",
+      "defaultValue": "",
+      "required": false,
+      "helpMarkDown": "Name shown in the tab's report picker. Defaults to the job name. Use a distinct name when the same job publishes more than one report."
+    },
+    {
+      "name": "ifMissing",
+      "type": "pickList",
+      "label": "When the report folder is missing",
+      "defaultValue": "warn",
+      "required": false,
+      "options": {
+        "warn": "Warn and succeed",
+        "error": "Fail the task",
+        "ignore": "Do nothing"
+      },
+      "helpMarkDown": "What to do when the report folder or its entry file cannot be found (for example when the test step was skipped)."
+    }
+  ],
+  "execution": {
+    "Node20_1": {
+      "target": "index.js",
+      "argumentFormat": ""
+    },
+    "Node16": {
+      "target": "index.js",
+      "argumentFormat": ""
+    }
+  }
+}

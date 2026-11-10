@@ -1,0 +1,47 @@
+# Example pipeline: run playwright-bdd tests and publish the reports to the "Playwright BDD" tab.
+# Paths are relative to the root of this repository; in your own project the sample
+# folder is usually the repository root, so drop `demoDir`.
+trigger: none
+
+pool:
+  vmImage: ubuntu-latest
+
+variables:
+  demoDir: samples/demo
+
+steps:
+  - task: NodeTool@0
+    inputs:
+      versionSpec: '20.x'
+
+  - script: npm ci && npx playwright install --with-deps chromium
+    displayName: Install dependencies
+    workingDirectory: $(demoDir)
+
+  # The sample contains one deliberately failing scenario, so this step fails.
+  - script: npm test
+    displayName: Run playwright-bdd tests
+    workingDirectory: $(demoDir)
+
+  # Shows the Cucumber HTML report in the "Playwright BDD" tab of the run.
+  - task: PublishPlaywrightBddReport@1
+    displayName: Publish Cucumber report
+    condition: succeededOrFailed()
+    inputs:
+      reportDir: $(demoDir)/cucumber-report
+      reportName: Cucumber report
+
+  # Optional: Playwright's own HTML report, selectable from the same tab.
+  - task: PublishPlaywrightBddReport@1
+    displayName: Publish Playwright report
+    condition: succeededOrFailed()
+    inputs:
+      reportDir: $(demoDir)/playwright-report
+      reportName: Playwright report
+
+  # Optional: pass/fail counts and history in the built-in "Tests" tab.
+  - task: PublishTestResults@2
+    condition: succeededOrFailed()
+    inputs:
+      testResultsFormat: JUnit
+      testResultsFiles: $(demoDir)/cucumber-report/junit.xml

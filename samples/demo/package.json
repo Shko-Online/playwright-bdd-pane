@@ -1,0 +1,14 @@
+{
+  "name": "playwright-bdd-demo",
+  "version": "1.0.0",
+  "description": "Sample playwright-bdd project used to exercise the Azure DevOps extension",
+  "scripts": {
+    "test": "bddgen && playwright test"
+  },
+  "type": "commonjs",
+  "devDependencies": {
+    "@playwright/test": "^1.65.0",
+    "playwright-bdd": "^9.2.1"
+  },
+  "private": true
+}

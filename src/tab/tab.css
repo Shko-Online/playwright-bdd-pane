@@ -1,0 +1,170 @@
+/* Colours come from the Azure DevOps theme (SDK applyTheme) with light-theme fallbacks. */
+:root {
+  --pbdd-bg: var(--background-color, #ffffff);
+  --pbdd-fg: var(--text-primary-color, rgba(0, 0, 0, 0.9));
+  --pbdd-muted: var(--text-secondary-color, rgba(0, 0, 0, 0.55));
+  --pbdd-border: rgba(var(--palette-neutral-8, 234, 234, 234), 1);
+  --pbdd-button-bg: rgba(var(--palette-neutral-4, 244, 244, 244), 1);
+  --pbdd-button-hover: rgba(var(--palette-neutral-8, 234, 234, 234), 1);
+  --pbdd-accent: var(--communication-background, #0078d4);
+  --pbdd-notice-bg: rgba(var(--status-warning-background-rgb, 255, 244, 206), 1);
+  --pbdd-error: var(--status-error-foreground, #a4262c);
+}
+
+html,
+body {
+  margin: 0;
+  height: 100%;
+  background: var(--pbdd-bg);
+  color: var(--pbdd-fg);
+  font-family: "Segoe UI", -apple-system, BlinkMacSystemFont, Roboto, "Helvetica Neue", sans-serif;
+  font-size: 14px;
+}
+
+#app {
+  height: 100%;
+}
+
+.pbdd {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 480px;
+}
+
+.pbdd-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  border-bottom: 1px solid var(--pbdd-border);
+}
+
+.pbdd-picker {
+  font: inherit;
+  color: inherit;
+  background: var(--pbdd-bg);
+  border: 1px solid var(--pbdd-border);
+  border-radius: 2px;
+  padding: 4px 8px;
+  max-width: 100%;
+}
+
+.pbdd-meta {
+  flex: 1 1 160px;
+  color: var(--pbdd-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-width: 0;
+}
+
+.pbdd-actions {
+  display: flex;
+  gap: 8px;
+  margin-left: auto;
+}
+
+.pbdd-button {
+  font: inherit;
+  font-weight: 600;
+  color: inherit;
+  background: var(--pbdd-button-bg);
+  border: none;
+  border-radius: 2px;
+  padding: 6px 12px;
+  cursor: pointer;
+}
+
+.pbdd-button:hover:not(:disabled) {
+  background: var(--pbdd-button-hover);
+}
+
+.pbdd-button:focus-visible,
+.pbdd-picker:focus-visible {
+  outline: 2px solid var(--pbdd-accent);
+  outline-offset: 1px;
+}
+
+.pbdd-button:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.pbdd-notice {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  background: var(--pbdd-notice-bg);
+  color: rgba(0, 0, 0, 0.9);
+}
+
+.pbdd-notice-text {
+  flex: 1;
+}
+
+.pbdd-notice-close {
+  font-size: 18px;
+  line-height: 1;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: inherit;
+}
+
+.pbdd-stage {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+}
+
+.pbdd-frame {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border: 0;
+  background: #fff; /* reports are designed for a light page */
+}
+
+.pbdd-status {
+  max-width: 60ch;
+  margin: 48px auto;
+  padding: 0 16px;
+  text-align: center;
+  color: var(--pbdd-muted);
+  line-height: 1.5;
+}
+
+.pbdd-status[data-kind="busy"]::before {
+  content: "";
+  display: block;
+  width: 24px;
+  height: 24px;
+  margin: 0 auto 12px;
+  border: 3px solid var(--pbdd-border);
+  border-top-color: var(--pbdd-accent);
+  border-radius: 50%;
+  animation: pbdd-spin 0.8s linear infinite;
+}
+
+.pbdd-status[data-kind="error"] {
+  color: var(--pbdd-error);
+}
+
+[hidden] {
+  display: none !important;
+}
+
+@keyframes pbdd-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pbdd-status[data-kind="busy"]::before {
+    animation: none;
+  }
+}

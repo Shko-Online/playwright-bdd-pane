@@ -1,0 +1,16 @@
+{
+  "name": "publish-playwright-bdd-report",
+  "description": "Azure Pipelines task: publish a playwright-bdd HTML report as a build attachment",
+  "main": "index.js",
+  "license": "MIT",
+  "type": "commonjs",
+  "dependencies": {
+    "azure-pipelines-task-lib": "^5.281.2"
+  },
+  "devDependencies": {
+    "@types/node": "^20.19.43",
+    "jszip": "^3.10.2"
+  },
+  "private": true,
+  "version": "1.0.0"
+}

@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Fake Azure DevOps host</title>
+    <style>
+      html, body { margin: 0; height: 100%; font-family: sans-serif; }
+      body { display: flex; flex-direction: column; }
+      header { padding: 8px 16px; background: #f8f8f8; border-bottom: 1px solid #ddd; font-size: 13px; }
+      iframe { flex: 1; border: 0; }
+    </style>
+  </head>
+  <body>
+    <header>Simulated build results page: the viewer runs in a cross-origin, sandboxed iframe, like an extension tab.</header>
+    <iframe
+      id="ext"
+      sandbox="allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sandbox allow-forms allow-modals allow-downloads"
+    ></iframe>
+    <script>
+      // Same port, different host name → different origin, like extension CDN vs dev.azure.com.
+      const other = location.hostname === 'localhost' ? '127.0.0.1' : 'localhost';
+      document.getElementById('ext').src = `${location.protocol}//${other}:${location.port}/dev.html`;
+    </script>
+  </body>
+</html>

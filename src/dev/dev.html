@@ -1,0 +1,18 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Playwright BDD viewer (dev)</title>
+    <link rel="stylesheet" href="tab.css" />
+    <style>
+      .dev-bar { padding: 4px 16px; font-size: 12px; background: #fff4ce; }
+      body { display: flex; flex-direction: column; }
+      #app { flex: 1; min-height: 0; }
+    </style>
+  </head>
+  <body>
+    <div class="dev-bar">Dev harness · load a report zip: <input type="file" id="pick" accept=".zip" /></div>
+    <div id="app"></div>
+    <script src="dev.js"></script>
+  </body>
+</html>
