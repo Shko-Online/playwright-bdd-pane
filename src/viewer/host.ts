@@ -8,6 +8,13 @@ const VIRTUAL_ORIGIN = 'https://report.invalid';
 export interface ReportHostEvents {
   /** Something the user should know about (e.g. popup blocked). */
   onNotice?(message: string): void;
+  /**
+   * A report page asked to show `path` in a new browser tab (target=_blank link, middle
+   * click, window.open). Blob URLs created in a third-party iframe (the Azure DevOps tab)
+   * cannot be opened in a new tab, so the embedding UI can take over. Without a handler
+   * the blob URL is opened directly, which works in a first-party page.
+   */
+  onOpenPage?(path: string, hash: string): void;
 }
 
 /**
@@ -30,6 +37,8 @@ export class ReportHost {
     this.globalApi = {
       lookup: (path: string) => this.lookup(path),
       openTrace: (paths: string[]) => this.openTrace(paths),
+      openPage: (path: string, hash: string) => this.openPage(path, hash),
+      pathOf: (url: string) => this.pathOf(url),
       dispose: () => this.dispose(),
     };
     w.__pbddHost = this.globalApi;
@@ -38,6 +47,25 @@ export class ReportHost {
   /** Blob URL of the report's entry page. */
   get entryUrl(): string {
     return this.lookup(this.archive.entry)!;
+  }
+
+  /** Archive path of a blob URL handed out by {@link lookup} (fragment ignored). */
+  pathOf(url: string): string | undefined {
+    const bare = url.split('#')[0];
+    for (const [path, u] of this.urls) if (u === bare) return path;
+    return undefined;
+  }
+
+  /** Show an archive file in a new browser tab. */
+  openPage(path: string, hash = ''): void {
+    if (this.events.onOpenPage) {
+      this.events.onOpenPage(path, hash);
+      return;
+    }
+    const url = this.lookup(path);
+    if (url && !window.open(url + hash, '_blank')) {
+      this.events.onNotice?.('The browser blocked the new tab. Allow pop-ups for this site and try again.');
+    }
   }
 
   /** Blob URL for an archive path, created on first use. HTML and CSS are rewritten first. */

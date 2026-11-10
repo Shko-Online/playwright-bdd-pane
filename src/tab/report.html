@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Playwright BDD report</title>
+    <link rel="stylesheet" href="tab.css" />
+    <link rel="icon" href="../images/icon.png" />
+    <style>
+      body { display: flex; flex-direction: column; }
+      .pbdd-stage { flex: 1; min-height: 0; }
+    </style>
+  </head>
+  <body>
+    <div id="notice" class="pbdd-notice" role="status" hidden>
+      <span class="pbdd-notice-text"></span>
+      <button type="button" class="pbdd-notice-close" aria-label="Dismiss">×</button>
+    </div>
+    <main class="pbdd-stage">
+      <div id="status" class="pbdd-status"></div>
+      <iframe
+        id="frame"
+        class="pbdd-frame"
+        title="Playwright BDD report"
+        sandbox="allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sandbox allow-forms allow-modals allow-downloads"
+        allow="clipboard-write; fullscreen"
+        hidden
+      ></iframe>
+    </main>
+    <script src="report.js"></script>
+  </body>
+</html>

@@ -40,3 +40,14 @@ document.getElementById('pick')!.addEventListener('change', (e) => {
     void viewer.refresh();
   }
 });
+
+// Dev-only: lets the fake host page (host.html) press toolbar buttons inside this
+// cross-origin frame, so popup behaviour can be tested in a partitioned iframe.
+window.addEventListener('message', (e) => {
+  if (e.data?.type === 'dev-click') (document.querySelector(e.data.selector) as HTMLElement | null)?.click();
+  if (e.data?.type === 'dev-pick') {
+    const picker = document.querySelector('.pbdd-picker') as HTMLSelectElement;
+    picker.value = [...picker.options].find((o) => o.text.includes(e.data.label))?.value ?? picker.value;
+    picker.dispatchEvent(new Event('change'));
+  }
+});

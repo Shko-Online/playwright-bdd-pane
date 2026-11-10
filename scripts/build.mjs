@@ -32,7 +32,9 @@ const browser = {
   logLevel: 'warning',
 };
 await esbuild.build({ ...browser, entryPoints: [path.join(root, 'src/tab/main.ts')], outfile: path.join(web, 'tab.js') });
+await esbuild.build({ ...browser, entryPoints: [path.join(root, 'src/tab/report.ts')], outfile: path.join(web, 'report.js') });
 copy('src/tab/tab.html', path.join(web, 'tab.html'));
+copy('src/tab/report.html', path.join(web, 'report.html'));
 copy('src/tab/tab.css', path.join(web, 'tab.css'));
 
 if (dev) {

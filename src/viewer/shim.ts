@@ -128,6 +128,11 @@ export function reportShim(currentPath: string): void {
       openTraces(t.search);
       return null;
     }
+    const h = host();
+    if (t && h && h.lookup(t.path)) {
+      h.openPage(t.path, t.hash);
+      return null;
+    }
     return nativeWindowOpen.call(this, map(url), ...rest);
   };
 
@@ -189,12 +194,25 @@ export function reportShim(currentPath: string): void {
     const target = e.target as Element | null;
     const a = target && target.closest ? target.closest('a[href]') : null;
     if (!a) return;
-    const t = toArchivePath(a.getAttribute('href'));
+    const href = a.getAttribute('href');
+    const t = toArchivePath(href);
     if (t && isTraceViewer(t.path)) {
       e.preventDefault();
       e.stopImmediatePropagation();
       openTraces(t.search);
+      return;
     }
+    // Links into the report that open a new tab: let the host decide how (see ReportHost.openPage).
+    // `href` is usually already a blob URL by now, so look it up both ways.
+    const newTab = a.getAttribute('target') === '_blank' || e.button === 1 || e.ctrlKey || e.metaKey || e.shiftKey;
+    if (!newTab || a.hasAttribute('download')) return;
+    const h = host();
+    if (!h) return;
+    const path = t && h.lookup(t.path) ? t.path : href && /^blob:/i.test(href) ? h.pathOf(href) : undefined;
+    if (!path) return;
+    e.preventDefault();
+    e.stopImmediatePropagation();
+    h.openPage(path, href && href.indexOf('#') >= 0 ? href.slice(href.indexOf('#')) : '');
   };
   window.addEventListener('click', onClick, true);
   window.addEventListener('auxclick', onClick, true);

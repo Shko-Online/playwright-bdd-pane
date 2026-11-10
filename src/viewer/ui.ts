@@ -43,6 +43,10 @@ export class ReportViewer {
   private refs: ReportRef[] = [];
   private selectedId: string | undefined;
   private host: ReportHost | undefined;
+  /** Zip bytes and label of the report on screen, handed to report.html tabs. */
+  private current: { data: ArrayBuffer; name: string } | undefined;
+  /** report.html tabs opened from here, and the report each one should show. */
+  private readonly popups = new Map<Window, { data: ArrayBuffer; name: string }>();
   private loadToken = 0;
   private pollTimer: number | undefined;
 
@@ -83,6 +87,7 @@ export class ReportViewer {
     this.picker.addEventListener('change', () => this.select(this.picker.value));
     this.openButton.addEventListener('click', () => this.openInNewTab());
     this.refreshButton.addEventListener('click', () => this.refresh());
+    window.addEventListener('message', (e) => this.answerPopup(e));
     root.querySelector('.pbdd-notice-close')!.addEventListener('click', () => (this.notice.hidden = true));
   }
 
@@ -183,7 +188,11 @@ export class ReportViewer {
       if (token !== this.loadToken) return;
 
       this.host?.dispose();
-      this.host = new ReportHost(archive, { onNotice: (m) => this.showNotice(m) });
+      this.host = new ReportHost(archive, {
+        onNotice: (m) => this.showNotice(m),
+        onOpenPage: (path, hash) => this.openInNewTab(path, hash),
+      });
+      this.current = { data, name: ref.label };
 
       const m = archive.manifest;
       const details = [
@@ -204,19 +213,41 @@ export class ReportViewer {
     }
   }
 
-  private openInNewTab(): void {
-    if (!this.host) return;
-    let url = this.host.entryUrl;
-    try {
-      // Keep the page the user navigated to (e.g. a specific scenario).
-      const current = this.frame.contentWindow?.location.href;
-      if (current?.startsWith('blob:')) url = current;
-    } catch {
-      // not readable; fall back to the entry page
+  /**
+   * Opens the report in a new browser tab. The tab is report.html, a real page of this
+   * extension: blob URLs created inside the (third-party) Azure DevOps iframe cannot be
+   * used by a new top-level tab, so report.html asks us for the zip and serves it itself.
+   */
+  private openInNewTab(path?: string, hash = ''): void {
+    if (!this.host || !this.current) return;
+    if (path === undefined) {
+      try {
+        // Keep the page the user navigated to (e.g. a specific scenario).
+        const href = this.frame.contentWindow?.location.href ?? '';
+        path = this.host.pathOf(href);
+        hash = href.includes('#') ? href.slice(href.indexOf('#')) : '';
+      } catch {
+        // not readable; fall back to the entry page
+      }
     }
-    if (!window.open(url, '_blank')) {
+    const url = new URL('report.html', location.href);
+    url.hash = new URLSearchParams({ page: path ?? '', hash }).toString();
+
+    for (const w of this.popups.keys()) if (w.closed) this.popups.delete(w);
+    const popup = window.open(url.href, '_blank');
+    if (!popup) {
       this.showNotice('The browser blocked the new tab. Allow pop-ups for this site and try again.');
+      return;
     }
+    this.popups.set(popup, this.current);
+  }
+
+  /** report.html announces itself (also after a reload); send it the report it was opened for. */
+  private answerPopup(e: MessageEvent): void {
+    if (e.data?.type !== 'pbdd-ready') return;
+    const report = this.popups.get(e.source as Window);
+    if (!report) return;
+    (e.source as Window).postMessage({ type: 'pbdd-report', ...report }, e.origin === 'null' ? '*' : e.origin);
   }
 
   private setStatus(text: string, kind: 'busy' | 'empty' | 'error'): void {
