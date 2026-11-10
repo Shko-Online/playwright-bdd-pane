@@ -153,6 +153,124 @@ body {
   color: var(--pbdd-error);
 }
 
+/* --- "Built for free by Shko Online" ------------------------------------- */
+
+.pbdd-upsell-link {
+  font: inherit;
+  font-size: 12px;
+  color: var(--pbdd-muted);
+  background: none;
+  border: none;
+  padding: 6px 4px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.pbdd-upsell-link:hover {
+  color: var(--pbdd-fg);
+  text-decoration: underline;
+}
+
+.pbdd-upsell-link:focus-visible,
+.pbdd-upsell a:focus-visible,
+.pbdd-upsell button:focus-visible {
+  outline: 2px solid var(--pbdd-accent);
+  outline-offset: 1px;
+}
+
+.pbdd-upsell {
+  width: min(520px, calc(100vw - 32px));
+  max-height: calc(100vh - 32px);
+  padding: 0;
+  border: 1px solid var(--pbdd-border);
+  border-radius: 6px;
+  background: var(--pbdd-bg);
+  color: var(--pbdd-fg);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25);
+}
+
+.pbdd-upsell::backdrop {
+  background: rgba(0, 0, 0, 0.35);
+}
+
+.pbdd-upsell-body {
+  position: relative;
+  padding: 24px;
+  line-height: 1.5;
+}
+
+.pbdd-upsell h2 {
+  margin: 0 32px 12px 0;
+  font-size: 18px;
+}
+
+.pbdd-upsell p,
+.pbdd-upsell ul {
+  margin: 0 0 12px;
+}
+
+.pbdd-upsell ul {
+  padding-left: 20px;
+}
+
+.pbdd-upsell li + li {
+  margin-top: 4px;
+}
+
+.pbdd-upsell a {
+  color: var(--pbdd-accent);
+}
+
+.pbdd-upsell-close-form {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  margin: 0;
+}
+
+.pbdd-upsell-close {
+  font-size: 20px;
+  line-height: 1;
+  width: 32px;
+  height: 32px;
+  color: var(--pbdd-muted);
+  background: none;
+  border: none;
+  border-radius: 2px;
+  cursor: pointer;
+}
+
+.pbdd-upsell-close:hover {
+  background: var(--pbdd-button-hover);
+}
+
+.pbdd-upsell-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 16px 0;
+}
+
+.pbdd-upsell-actions .pbdd-button {
+  text-decoration: none;
+  color: inherit;
+}
+
+.pbdd-upsell-actions .pbdd-button-primary {
+  background: var(--pbdd-accent);
+  color: #fff;
+}
+
+.pbdd-upsell-actions .pbdd-button-primary:hover {
+  filter: brightness(1.1);
+  background: var(--pbdd-accent);
+}
+
+.pbdd-upsell-fine {
+  font-size: 12px;
+  color: var(--pbdd-muted);
+}
+
 [hidden] {
   display: none !important;
 }

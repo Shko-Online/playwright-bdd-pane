@@ -9,6 +9,7 @@
 import { loadArchive } from '../viewer/archive';
 import { ReportHost } from '../viewer/host';
 import type { PopupReport } from '../viewer/ui';
+import { createUpsellLink } from '../viewer/upsell';
 import { showBanner } from '../shared/banner';
 
 showBanner('Playwright BDD');
@@ -16,6 +17,7 @@ showBanner('Playwright BDD');
 const status = document.getElementById('status')!;
 const frame = document.getElementById('frame') as HTMLIFrameElement;
 const notice = document.getElementById('notice')!;
+document.getElementById('actions')!.append(createUpsellLink());
 
 const state = new URLSearchParams(location.hash.slice(1));
 let host: ReportHost | undefined;
@@ -43,6 +45,7 @@ async function show({ data, name, runUrlTemplate }: PopupReport): Promise<void> 
   showStatus('Unpacking report…', 'busy');
   const archive = await loadArchive(data);
   document.title = `${name} · Playwright BDD`;
+  document.getElementById('title')!.textContent = name;
   host?.dispose();
   host = new ReportHost(archive, {
     runUrlTemplate,

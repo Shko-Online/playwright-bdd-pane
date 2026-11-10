@@ -1,5 +1,6 @@
 import { loadArchive } from './archive';
 import { ReportHost } from './host';
+import { createUpsellLink } from './upsell';
 
 export interface ReportRef {
   /** Stable identifier, used to keep the selection across refreshes. */
@@ -90,6 +91,7 @@ export class ReportViewer {
     this.notice = root.querySelector('.pbdd-notice')!;
     this.status = root.querySelector('.pbdd-status')!;
     this.frame = root.querySelector('.pbdd-frame')!;
+    root.querySelector('.pbdd-actions')!.append(createUpsellLink());
     this.frame.setAttribute('sandbox', FRAME_SANDBOX);
     this.frame.setAttribute('allow', 'clipboard-write; fullscreen');
 

@@ -55,3 +55,9 @@ Review [playwright-bdd](https://vitalets.github.io/playwright-bdd/) test reports
 - **Runs in progress.** The tab checks for new reports every few seconds until the run completes.
 - **Permissions.** The extension only asks for *Build (read)* to read the reports attached to a run.
 - **`externalAttachments: true`** keeps the report small and fast to load. It is also required for *View trace* links in the Cucumber report.
+
+## Built for free by Shko Online
+
+Playwright BDD Report is built and maintained for free by [Shko Online](https://shko.online/?utm_source=azure-devops&utm_medium=marketplace&utm_campaign=playwright-bdd-report), a Microsoft Business Applications consultancy in Tirana, Albania. We build Azure DevOps extensions, pipelines and test automation, and deliver Dynamics 365, Power Platform and Azure projects.
+
+Need a feature, or help with your next project? [Book a consultation](https://shko.online/contact-us?utm_source=azure-devops&utm_medium=marketplace&utm_campaign=playwright-bdd-report) or write to sales@shko.online.
