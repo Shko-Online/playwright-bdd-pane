@@ -9,6 +9,9 @@
 import { loadArchive } from '../viewer/archive';
 import { ReportHost } from '../viewer/host';
 import type { PopupReport } from '../viewer/ui';
+import { showBanner } from '../shared/banner';
+
+showBanner('Playwright BDD');
 
 const status = document.getElementById('status')!;
 const frame = document.getElementById('frame') as HTMLIFrameElement;

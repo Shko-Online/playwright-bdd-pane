@@ -2,7 +2,7 @@
   "manifestVersion": 1,
   "id": "playwright-bdd-pane",
   "publisher": "shko-online",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "name": "Playwright BDD Report",
   "description": "Publish playwright-bdd test reports from your pipelines and review them in a tab of the run, right in the browser.",
   "public": false,

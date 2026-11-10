@@ -3,6 +3,7 @@
  * fed from zips in .fixtures/ (produced by running the real task) or a picked file.
  */
 import { readWithProgress, ReportViewer, type ReportRef, type ReportSource } from '../viewer/ui';
+import { showBanner } from '../shared/banner';
 
 class LocalSource implements ReportSource {
   private picked = new Map<string, File>();
@@ -33,6 +34,8 @@ class LocalSource implements ReportSource {
     return readWithProgress(res, onProgress);
   }
 }
+
+showBanner('Playwright BDD');
 
 const source = new LocalSource();
 const viewer = new ReportViewer(document.getElementById('app')!, source);

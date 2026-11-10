@@ -8,6 +8,7 @@ import {
 } from 'azure-devops-extension-api/Build';
 import { ATTACHMENT_TYPE } from '../shared/constants';
 import { readWithProgress, ReportViewer, type ReportRef, type ReportSource } from '../viewer/ui';
+import { showBanner } from '../shared/banner';
 
 // Service ids are const enums in the typings; spell them out so bundling stays simple.
 const PROJECT_PAGE_SERVICE = 'ms.vss-tfs-web.tfs-page-data-service';
@@ -121,6 +122,7 @@ function currentBuild(): Promise<Pick<Build, 'id' | 'project'>> {
 }
 
 async function main(): Promise<void> {
+  showBanner('Playwright BDD');
   const root = document.getElementById('app')!;
   await SDK.init({ loaded: false, applyTheme: true });
 
