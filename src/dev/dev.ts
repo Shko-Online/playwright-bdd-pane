@@ -7,6 +7,11 @@ import { readWithProgress, ReportViewer, type ReportRef, type ReportSource } fro
 class LocalSource implements ReportSource {
   private picked = new Map<string, File>();
 
+  /** Pretend runs live in the Shko-Online org, so vstfs:///Build/Build/<id> links resolve. */
+  runUrlTemplate(): string {
+    return 'https://dev.azure.com/Shko-Online/Shko.Online/_build/results?buildId={id}';
+  }
+
   addFile(file: File): ReportRef {
     this.picked.set(file.name, file);
     return { id: `file:${file.name}`, label: `${file.name} (local file)` };

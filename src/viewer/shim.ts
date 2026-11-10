@@ -69,6 +69,12 @@ export function reportShim(currentPath: string): void {
   const isTraceViewer = (path: string) => /(^|\/)trace\/index\.html$/i.test(path);
 
   const map = (raw: any): any => {
+    // Non-web links (e.g. Cucumber's Azure Pipelines run link, vstfs:///Build/Build/123):
+    // the host may know a browsable equivalent.
+    if (typeof raw === 'string' && /^vstfs:/i.test(raw)) {
+      const h = host();
+      return (h && h.externalUrl && h.externalUrl(raw)) || raw;
+    }
     const t = toArchivePath(raw);
     if (!t || isTraceViewer(t.path)) return raw;
     const h = host();
@@ -173,6 +179,15 @@ export function reportShim(currentPath: string): void {
       const m = map(v);
       if (m !== v) nativeSetAttribute.call(el, a, m);
     }
+    // Links to other sites must not replace the report inside its frame (most sites, Azure
+    // DevOps included, refuse to be framed): open them in a new tab instead.
+    if (el.tagName === 'A' && !el.getAttribute('target')) {
+      const href = el.getAttribute('href') || '';
+      if (/^https?:/i.test(href) && !toArchivePath(href)) {
+        nativeSetAttribute.call(el, 'target', '_blank');
+        nativeSetAttribute.call(el, 'rel', 'noopener noreferrer');
+      }
+    }
   };
   const fixTree = (node: Node) => {
     if (node.nodeType !== 1) return;
@@ -195,6 +210,11 @@ export function reportShim(currentPath: string): void {
     const a = target && target.closest ? target.closest('a[href]') : null;
     if (!a) return;
     const href = a.getAttribute('href');
+    if (href && /^vstfs:/i.test(href)) {
+      e.preventDefault();
+      e.stopImmediatePropagation();
+      return;
+    }
     const t = toArchivePath(href);
     if (t && isTraceViewer(t.path)) {
       e.preventDefault();

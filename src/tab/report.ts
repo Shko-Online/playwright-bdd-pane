@@ -8,6 +8,7 @@
  */
 import { loadArchive } from '../viewer/archive';
 import { ReportHost } from '../viewer/host';
+import type { PopupReport } from '../viewer/ui';
 
 const status = document.getElementById('status')!;
 const frame = document.getElementById('frame') as HTMLIFrameElement;
@@ -35,12 +36,13 @@ function rememberPosition(): void {
   }
 }
 
-async function show(data: ArrayBuffer, name: string): Promise<void> {
+async function show({ data, name, runUrlTemplate }: PopupReport): Promise<void> {
   showStatus('Unpacking report…', 'busy');
   const archive = await loadArchive(data);
   document.title = `${name} · Playwright BDD`;
   host?.dispose();
   host = new ReportHost(archive, {
+    runUrlTemplate,
     onNotice: (m) => {
       notice.querySelector('span')!.textContent = m;
       notice.hidden = false;
@@ -75,7 +77,7 @@ if (!opener) {
   window.addEventListener('message', (e) => {
     if (e.source !== opener || e.data?.type !== 'pbdd-report' || received) return;
     received = true;
-    show(e.data.data, e.data.name).catch((err) =>
+    show(e.data as PopupReport).catch((err) =>
       showStatus(`Could not open the report. ${err instanceof Error ? err.message : String(err)}`, 'error'),
     );
   });

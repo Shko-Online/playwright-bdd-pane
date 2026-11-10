@@ -23,12 +23,17 @@ interface AttachmentRef extends ReportRef {
 /** Reports published by the task, read from the build's attachments. */
 class BuildAttachmentSource implements ReportSource {
   private status: BuildStatus | undefined;
+  private runUrl: string | undefined;
   private readonly client = getClient(BuildRestClient);
 
   constructor(
     private readonly project: string,
     private readonly buildId: number,
   ) {}
+
+  runUrlTemplate(): string | undefined {
+    return this.runUrl;
+  }
 
   mayPublishMore(): boolean {
     return this.status !== undefined && this.status !== BuildStatus.Completed;
@@ -40,6 +45,8 @@ class BuildAttachmentSource implements ReportSource {
       this.client.getBuild(this.project, this.buildId),
     ]);
     this.status = build.status;
+    const web: string | undefined = build._links?.web?.href;
+    if (web && /[?&]buildId=\d+/.test(web)) this.runUrl = web.replace(/([?&]buildId=)\d+/, '$1{id}');
 
     const refs: AttachmentRef[] = attachments.map((a) => {
       const href: string = a._links?.self?.href ?? '';

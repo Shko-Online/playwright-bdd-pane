@@ -13,6 +13,15 @@ export interface ReportSource {
   download(ref: ReportRef, onProgress: (loaded: number, total?: number) => void): Promise<ArrayBuffer>;
   /** True while more reports may still be published (e.g. the run is in progress). */
   mayPublishMore?(): boolean;
+  /** Web URL of a pipeline run with `{id}` for the build id (see ReportHostEvents.runUrlTemplate). */
+  runUrlTemplate?(): string | undefined;
+}
+
+/** What report.html receives from the tab that opened it. */
+export interface PopupReport {
+  data: ArrayBuffer;
+  name: string;
+  runUrlTemplate?: string;
 }
 
 export interface ViewerOptions {
@@ -44,9 +53,9 @@ export class ReportViewer {
   private selectedId: string | undefined;
   private host: ReportHost | undefined;
   /** Zip bytes and label of the report on screen, handed to report.html tabs. */
-  private current: { data: ArrayBuffer; name: string } | undefined;
+  private current: PopupReport | undefined;
   /** report.html tabs opened from here, and the report each one should show. */
-  private readonly popups = new Map<Window, { data: ArrayBuffer; name: string }>();
+  private readonly popups = new Map<Window, PopupReport>();
   private loadToken = 0;
   private pollTimer: number | undefined;
 
@@ -191,8 +200,9 @@ export class ReportViewer {
       this.host = new ReportHost(archive, {
         onNotice: (m) => this.showNotice(m),
         onOpenPage: (path, hash) => this.openInNewTab(path, hash),
+        runUrlTemplate: this.source.runUrlTemplate?.(),
       });
-      this.current = { data, name: ref.label };
+      this.current = { data, name: ref.label, runUrlTemplate: this.source.runUrlTemplate?.() };
 
       const m = archive.manifest;
       const details = [

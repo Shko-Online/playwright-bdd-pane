@@ -15,6 +15,11 @@ export interface ReportHostEvents {
    * the blob URL is opened directly, which works in a first-party page.
    */
   onOpenPage?(path: string, hash: string): void;
+  /**
+   * URL of a pipeline run, with `{id}` in place of the build id. Lets links such as
+   * Cucumber's `vstfs:///Build/Build/123` (its "Azure Pipelines" CI link) open the run.
+   */
+  runUrlTemplate?: string;
 }
 
 /**
@@ -39,6 +44,7 @@ export class ReportHost {
       openTrace: (paths: string[]) => this.openTrace(paths),
       openPage: (path: string, hash: string) => this.openPage(path, hash),
       pathOf: (url: string) => this.pathOf(url),
+      externalUrl: (url: string) => this.externalUrl(url),
       dispose: () => this.dispose(),
     };
     w.__pbddHost = this.globalApi;
@@ -53,6 +59,13 @@ export class ReportHost {
   pathOf(url: string): string | undefined {
     const bare = url.split('#')[0];
     for (const [path, u] of this.urls) if (u === bare) return path;
+    return undefined;
+  }
+
+  /** Browsable equivalent of a non-web link found in a report, if known. */
+  externalUrl(url: string): string | undefined {
+    const run = /^vstfs:\/\/\/Build\/Build\/(\d+)\/?$/i.exec(url.trim());
+    if (run && this.events.runUrlTemplate) return this.events.runUrlTemplate.replace('{id}', run[1]);
     return undefined;
   }
 
