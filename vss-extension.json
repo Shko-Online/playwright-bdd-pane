@@ -2,7 +2,7 @@
   "manifestVersion": 1,
   "id": "playwright-bdd-pane",
   "publisher": "shko-online",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "name": "Playwright BDD Report",
   "description": "Publish playwright-bdd test reports from your pipelines and review them in a tab of the run, right in the browser.",
   "public": false,
@@ -34,7 +34,7 @@
     },
     {
       "id": "playwright-bdd-build-tab",
-      "type": "ms.vss-build-web.build-results-view",
+      "type": "ms.vss-build-web.build-results-tab",
       "description": "Shows playwright-bdd reports published by the Publish Playwright BDD report task.",
       "targets": ["ms.vss-build-web.build-results-view"],
       "properties": {
