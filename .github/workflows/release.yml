@@ -1,0 +1,65 @@
+name: Release
+
+# Publishes a new version to the Visual Studio Marketplace when releasable commits land on
+# main. semantic-release reads the Conventional Commit messages since the last v* tag:
+#   fix: → patch · feat: → minor · feat!: or a "BREAKING CHANGE:" footer → major
+#   anything else (docs:, chore:, ci:, refactor:, test: …) → no release
+# The version is stamped into the package at build time; nothing is committed back.
+#
+# Marketplace authentication uses Trusted Publishing (OIDC): no PAT or secret is stored.
+# The policy on the "shko-online" Marketplace publisher must name this repository, this
+# workflow file (release.yml) and the "marketplace" environment. Renaming any of them
+# breaks publishing until the policy is updated.
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: release
+  cancel-in-progress: false
+
+jobs:
+  release:
+    name: Release
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    environment: marketplace
+    permissions:
+      contents: write # push the version tag and create the GitHub Release
+      issues: write # comment on issues resolved by the release
+      pull-requests: write # comment on pull requests included in the release
+      id-token: write # GitHub OIDC token, exchanged for a short-lived Marketplace credential
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0 # semantic-release needs the full history and tags
+          persist-credentials: false
+
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: |
+            package-lock.json
+            tasks/PublishPlaywrightBddReport/package-lock.json
+
+      - name: Install dependencies
+        run: |
+          npm ci --ignore-scripts --no-audit --no-fund
+          npm ci --ignore-scripts --no-audit --no-fund --prefix tasks/PublishPlaywrightBddReport
+
+      - name: Typecheck
+        run: npm run typecheck
+
+      # verifyConditions checks the Trusted Publishing exchange before anything is tagged;
+      # prepare packages the .vsix; publish pushes it to the Marketplace, then the GitHub
+      # Release is created with the .vsix attached.
+      - name: Release
+        run: npx --no-install semantic-release
+        env:
+          GITHUB_TOKEN: ${{ github.token }}

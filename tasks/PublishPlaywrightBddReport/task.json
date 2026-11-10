@@ -6,10 +6,12 @@
   "description": "Publish a playwright-bdd HTML report (Cucumber or Playwright) so it can be reviewed in the \"Playwright BDD\" tab of the pipeline run.",
   "helpMarkDown": "Packs the report folder and attaches it to the run. Open the run and select the **Playwright BDD** tab to browse it, with no download needed. Add `condition: succeededOrFailed()` so the report is also published when tests fail.",
   "category": "Test",
-  "visibility": ["Build"],
+  "visibility": [
+    "Build"
+  ],
   "author": "Shko Online",
   "version": {
-    "Major": 1,
+    "Major": 0,
     "Minor": 0,
     "Patch": 0
   },

@@ -2,6 +2,7 @@
 //   build/web/                         the build results tab (bundled)
 //   build/tasks/PublishPlaywrightBddReport/  the pipeline task (bundled + production node_modules)
 // `--dev` also emits the local harness (dev.html / host.html) with inline source maps.
+// `--version x.y.z` stamps that version into the packaged task.json (used by releases).
 import * as esbuild from 'esbuild';
 import { execSync } from 'node:child_process';
 import fs from 'node:fs';
@@ -10,6 +11,11 @@ import { fileURLToPath } from 'node:url';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const dev = process.argv.includes('--dev');
+const versionArg = process.argv.indexOf('--version');
+const version = versionArg > 0 ? process.argv[versionArg + 1] : undefined;
+if (version !== undefined && !/^\d+\.\d+\.\d+$/.test(version)) {
+  throw new Error(`--version must look like 1.2.3, got "${version}"`);
+}
 const out = path.join(root, 'build');
 const web = path.join(out, 'web');
 const taskSrc = path.join(root, 'tasks', 'PublishPlaywrightBddReport');
@@ -60,8 +66,16 @@ await esbuild.build({
 for (const f of ['task.json', 'icon.png', 'package.json', 'package-lock.json']) {
   copy(path.join('tasks/PublishPlaywrightBddReport', f), path.join(taskOut, f));
 }
+if (version) {
+  // Agents cache tasks by version, so every release must carry a new task version too.
+  const taskJson = path.join(taskOut, 'task.json');
+  const task = JSON.parse(fs.readFileSync(taskJson, 'utf8'));
+  const [Major, Minor, Patch] = version.split('.').map(Number);
+  task.version = { Major, Minor, Patch };
+  fs.writeFileSync(taskJson, JSON.stringify(task, null, 2) + '\n');
+}
 // Don't let the npm_config_* settings of an outer `npm run` leak into this install.
 const env = Object.fromEntries(Object.entries(process.env).filter(([k]) => !/^npm_/i.test(k)));
 execSync('npm ci --omit=dev --ignore-scripts --no-audit --no-fund --loglevel=error', { cwd: taskOut, stdio: 'inherit', env });
 
-console.log(`Built ${path.relative(root, out)}/ (${dev ? 'dev' : 'production'})`);
+console.log(`Built ${path.relative(root, out)}/ (${dev ? 'dev' : 'production'}${version ? `, v${version}` : ''})`);

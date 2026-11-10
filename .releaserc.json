@@ -1,0 +1,22 @@
+{
+  "branches": ["main"],
+  "tagFormat": "v${version}",
+  "plugins": [
+    ["@semantic-release/commit-analyzer", { "preset": "conventionalcommits" }],
+    ["@semantic-release/release-notes-generator", { "preset": "conventionalcommits" }],
+    [
+      "@semantic-release/exec",
+      {
+        "verifyConditionsCmd": "node scripts/release/marketplace.mjs check",
+        "prepareCmd": "node scripts/package.mjs --version ${nextRelease.version}",
+        "publishCmd": "node scripts/release/marketplace.mjs publish out/shko-online.playwright-bdd-pane-${nextRelease.version}.vsix"
+      }
+    ],
+    [
+      "@semantic-release/github",
+      {
+        "assets": [{ "path": "out/*.vsix", "label": "Extension package (.vsix)" }]
+      }
+    ]
+  ]
+}
