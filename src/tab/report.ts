@@ -11,6 +11,7 @@ import { ReportHost } from '../viewer/host';
 import type { PopupReport } from '../viewer/ui';
 import { createUpsellLink } from '../viewer/upsell';
 import { showBanner } from '../shared/banner';
+import { luminance, setScheme } from '../viewer/theme';
 
 showBanner('Playwright BDD');
 
@@ -41,7 +42,9 @@ function rememberPosition(): void {
   }
 }
 
-async function show({ data, name, runUrlTemplate }: PopupReport): Promise<void> {
+async function show({ data, name, runUrlTemplate, scheme }: PopupReport): Promise<void> {
+  // Keep the Azure DevOps theme of the tab this was opened from (light or dark).
+  setScheme(scheme);
   showStatus('Unpacking report…', 'busy');
   const archive = await loadArchive(data);
   document.title = `${name} · Playwright BDD`;
@@ -61,13 +64,58 @@ async function show({ data, name, runUrlTemplate }: PopupReport): Promise<void> 
   status.hidden = true;
 }
 
+/*
+  The header follows the light or dark mode of the report below it. Reports decide that
+  themselves: the Cucumber report follows the system, the Playwright report has its own
+  setting (system, light or dark). Light text means a dark report; its background colour,
+  when it sets one, becomes the header's too, so the page reads as one surface.
+*/
+const systemDark = window.matchMedia('(prefers-color-scheme: dark)');
+let reportObserver: MutationObserver | undefined;
+
+function followReportTheme(): void {
+  let dark = systemDark.matches;
+  let background = '';
+  try {
+    const doc = frame.hidden ? null : frame.contentDocument;
+    const view = doc?.defaultView;
+    if (doc?.body && view) {
+      dark = luminance(view.getComputedStyle(doc.body).color) > 0.5;
+      background =
+        [doc.documentElement, doc.body]
+          .map((el) => view.getComputedStyle(el).backgroundColor)
+          .find((c) => !/^(transparent|rgba\(.*,\s*0\))$/.test(c)) ?? '';
+    }
+  } catch {
+    // report not readable: keep the system's mode
+  }
+  const root = document.documentElement;
+  root.dataset.reportTheme = dark ? 'dark' : 'light';
+  if (background) root.style.setProperty('--pbdd-report-bg', background);
+  else root.style.removeProperty('--pbdd-report-bg');
+}
+
+followReportTheme();
+// A report that follows the system has already switched when this fires (reading its
+// computed style brings it up to date).
+systemDark.addEventListener('change', followReportTheme);
+
 frame.addEventListener('load', () => {
   rememberPosition();
+  reportObserver?.disconnect();
   try {
     frame.contentWindow?.addEventListener('hashchange', rememberPosition);
+    // Playwright's theme setting switches a class on the report's root element.
+    const doc = frame.contentDocument;
+    if (doc) {
+      reportObserver = new MutationObserver(followReportTheme);
+      reportObserver.observe(doc.documentElement, { attributes: true });
+      if (doc.body) reportObserver.observe(doc.body, { attributes: true });
+    }
   } catch {
     // ignore
   }
+  followReportTheme();
 });
 notice.querySelector('button')!.addEventListener('click', () => (notice.hidden = true));
 

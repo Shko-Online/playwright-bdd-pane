@@ -9,6 +9,28 @@
   --pbdd-accent: var(--communication-background, #0078d4);
   --pbdd-notice-bg: rgba(var(--status-warning-background-rgb, 255, 244, 206), 1);
   --pbdd-error: var(--status-error-foreground, #a4262c);
+  --pbdd-link: var(--communication-foreground, #005a9e);
+}
+
+/*
+  report.html (a report in its own browser tab) has no Azure DevOps theme. Its header follows
+  the report instead: report.ts sets data-report-theme and, when the report paints one, the
+  report's background as --pbdd-report-bg.
+*/
+:root[data-report-theme="light"] {
+  --pbdd-bg: var(--pbdd-report-bg, #ffffff);
+}
+
+:root[data-report-theme="dark"] {
+  --pbdd-bg: var(--pbdd-report-bg, #121212);
+  --pbdd-fg: rgba(255, 255, 255, 0.9);
+  --pbdd-muted: rgba(255, 255, 255, 0.62);
+  --pbdd-border: rgba(255, 255, 255, 0.12);
+  --pbdd-button-bg: rgba(255, 255, 255, 0.08);
+  --pbdd-button-hover: rgba(255, 255, 255, 0.14);
+  --pbdd-link: rgb(152, 198, 255);
+  --pbdd-error: rgb(241, 112, 123);
+  color-scheme: dark;
 }
 
 html,
@@ -125,14 +147,16 @@ body {
   width: 100%;
   height: 100%;
   border: 0;
-  background: #fff; /* reports are designed for a light page */
   /*
-    Keep the frame light whatever the page's color-scheme. A report in dark mode (e.g.
-    Playwright's) leaves its own background transparent; the browser only paints a dark
-    backdrop behind it when the frame's color-scheme differs from the report's. On a page
-    with color-scheme: dark, the white background above would show through instead.
+    The frame's color-scheme is the report's preferred colour scheme. It follows the page's
+    light or dark theme (data-ado-theme, set from the Azure DevOps theme), so reports that
+    follow the preference (the Cucumber report, Playwright's "System" setting) switch with
+    Azure DevOps, live. Without a page theme, `normal` leaves it to the system.
+    Canvas is the matching backdrop. A report in dark mode leaves its own background
+    transparent, and the browser only paints one behind it when the schemes differ.
   */
-  color-scheme: light;
+  background: Canvas;
+  color-scheme: normal;
 }
 
 .pbdd-status {
@@ -225,7 +249,7 @@ body {
 }
 
 .pbdd-upsell a {
-  color: var(--pbdd-accent);
+  color: var(--pbdd-link);
 }
 
 .pbdd-upsell-close-form {
@@ -280,6 +304,14 @@ body {
 
 [hidden] {
   display: none !important;
+}
+
+:root[data-ado-theme="light"] .pbdd-frame {
+  color-scheme: light;
+}
+
+:root[data-ado-theme="dark"] .pbdd-frame {
+  color-scheme: dark;
 }
 
 @keyframes pbdd-spin {

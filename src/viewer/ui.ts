@@ -1,5 +1,6 @@
 import { loadArchive } from './archive';
 import { ReportHost } from './host';
+import type { Scheme } from './theme';
 import { createUpsellLink } from './upsell';
 
 export interface ReportRef {
@@ -23,6 +24,8 @@ export interface PopupReport {
   data: ArrayBuffer;
   name: string;
   runUrlTemplate?: string;
+  /** Light or dark theme of the opening page, so the report keeps it in its own tab. */
+  scheme?: Scheme;
 }
 
 export interface ViewerOptions {
@@ -270,7 +273,8 @@ export class ReportViewer {
     if (e.data?.type !== 'pbdd-ready') return;
     const report = this.popups.get(e.source as Window);
     if (!report) return;
-    (e.source as Window).postMessage({ type: 'pbdd-report', ...report }, e.origin === 'null' ? '*' : e.origin);
+    const scheme = document.documentElement.dataset.adoTheme as Scheme | undefined;
+    (e.source as Window).postMessage({ type: 'pbdd-report', ...report, scheme }, e.origin === 'null' ? '*' : e.origin);
   }
 
   private setStatus(text: string, kind: 'busy' | 'empty' | 'error'): void {

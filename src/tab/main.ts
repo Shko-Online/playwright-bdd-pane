@@ -9,6 +9,7 @@ import {
 import { ATTACHMENT_TYPE } from '../shared/constants';
 import { readWithProgress, ReportViewer, type ReportRef, type ReportSource } from '../viewer/ui';
 import { showBanner } from '../shared/banner';
+import { luminance, setScheme } from '../viewer/theme';
 
 // Service ids are const enums in the typings; spell them out so bundling stays simple.
 const PROJECT_PAGE_SERVICE = 'ms.vss-tfs-web.tfs-page-data-service';
@@ -124,7 +125,11 @@ function currentBuild(): Promise<Pick<Build, 'id' | 'project'>> {
 async function main(): Promise<void> {
   showBanner('Playwright BDD');
   const root = document.getElementById('app')!;
+  // The SDK applies the Azure DevOps theme as CSS variables, at start and whenever the user
+  // switches theme. Reports follow it through the frame's color-scheme (see tab.css).
+  window.addEventListener('themeApplied', followAzureDevOpsTheme);
   await SDK.init({ loaded: false, applyTheme: true });
+  followAzureDevOpsTheme();
 
   try {
     const build = await currentBuild();
@@ -148,6 +153,12 @@ async function main(): Promise<void> {
     root.textContent = err instanceof Error ? err.message : String(err);
     await SDK.notifyLoadFailed(err instanceof Error ? err : String(err));
   }
+}
+
+/** Light or dark Azure DevOps theme, from the theme's page background colour. */
+function followAzureDevOpsTheme(): void {
+  const background = getComputedStyle(document.documentElement).getPropertyValue('--background-color').trim();
+  setScheme(background ? (luminance(background) < 0.5 ? 'dark' : 'light') : undefined);
 }
 
 void main();
