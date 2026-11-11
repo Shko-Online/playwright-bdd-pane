@@ -126,6 +126,13 @@ body {
   height: 100%;
   border: 0;
   background: #fff; /* reports are designed for a light page */
+  /*
+    Keep the frame light whatever the page's color-scheme. A report in dark mode (e.g.
+    Playwright's) leaves its own background transparent; the browser only paints a dark
+    backdrop behind it when the frame's color-scheme differs from the report's. On a page
+    with color-scheme: dark, the white background above would show through instead.
+  */
+  color-scheme: light;
 }
 
 .pbdd-status {
