@@ -27,10 +27,11 @@ export const icons = {
       20,
     ),
   search: () => svg(`<circle cx="7" cy="7" r="4.5" ${stroke}/><path d="M10.5 10.5L14 14" ${stroke}/>`),
-  settings: () =>
+  sun: () =>
     svg(
-      `<circle cx="8" cy="8" r="2.2" ${stroke}/><path d="M8 1.5v2M8 12.5v2M1.5 8h2M12.5 8h2M3.4 3.4l1.4 1.4M11.2 11.2l1.4 1.4M3.4 12.6l1.4-1.4M11.2 4.8l1.4-1.4" ${stroke}/>`,
+      `<circle cx="8" cy="8" r="2.8" ${stroke}/><path d="M8 1.5v1.5M8 13v1.5M1.5 8H3M13 8h1.5M3.4 3.4l1.1 1.1M11.5 11.5l1.1 1.1M3.4 12.6l1.1-1.1M11.5 4.5l1.1-1.1" ${stroke}/>`,
     ),
+  moon: () => svg(`<path d="M13.5 9.6A5.8 5.8 0 016.4 2.5a5.8 5.8 0 107.1 7.1z" ${stroke}/>`),
   plus: () => svg(`<path d="M8 2.5v11M2.5 8h11" ${stroke}/>`),
   overview: () => svg(`<rect x="2" y="2" width="5" height="5" rx="1" ${stroke}/><rect x="9" y="2" width="5" height="5" rx="1" ${stroke}/><rect x="2" y="9" width="5" height="5" rx="1" ${stroke}/><rect x="9" y="9" width="5" height="5" rx="1" ${stroke}/>`),
   boards: () => svg(`<rect x="2" y="2" width="3.5" height="12" rx="1" ${stroke}/><rect x="6.5" y="2" width="3.5" height="8" rx="1" ${stroke}/><rect x="11" y="2" width="3" height="10" rx="1" ${stroke}/>`),

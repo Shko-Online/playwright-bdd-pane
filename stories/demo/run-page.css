@@ -175,6 +175,38 @@ body {
   color: var(--text-secondary-color);
 }
 
+.ado-theme-toggle {
+  padding: 6px;
+  border: none;
+  border-radius: 2px;
+  background: none;
+  cursor: pointer;
+}
+
+.ado-theme-toggle:hover {
+  color: var(--text-primary-color);
+  background: var(--ado-hover);
+}
+
+.ado-theme-toggle:focus-visible {
+  outline: 2px solid var(--ado-accent);
+  outline-offset: 1px;
+}
+
+.ado-theme-toggle[hidden] {
+  display: none;
+}
+
+.ado-theme-toggle svg {
+  width: 18px;
+  height: 18px;
+}
+
+:root[data-ado-theme="dark"] .ado-when-light,
+:root:not([data-ado-theme="dark"]) .ado-when-dark {
+  display: none;
+}
+
 .ado-body {
   display: flex;
   flex: 1;

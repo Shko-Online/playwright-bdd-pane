@@ -14,6 +14,8 @@ export interface RunPageOptions {
   tab: RunTab;
   /** Show the strip that explains this is a demo. */
   demoBanner: boolean;
+  /** Called by the theme button in the top bar; the button is hidden without it. */
+  onToggleTheme?: () => void;
 }
 
 const GITHUB = 'https://github.com/Shko-Online/playwright-bdd-pane';
@@ -50,7 +52,10 @@ export function createRunPage(options: RunPageOptions): HTMLElement {
         <span aria-current="page">${esc(run.buildNumber)}</span>
       </nav>
       <span class="ado-search">${icons.search()}<span>Search</span></span>
-      <span class="ado-topbar-icon" title="Settings">${icons.settings()}</span>
+      <button type="button" class="ado-topbar-icon ado-theme-toggle" data-theme-toggle aria-pressed="false"
+        aria-label="Dark theme" title="Switch between the light and dark theme"${options.onToggleTheme ? '' : ' hidden'}>
+        <span class="ado-when-light">${icons.moon()}</span><span class="ado-when-dark">${icons.sun()}</span>
+      </button>
     </header>
     <div class="ado-body">
       <nav class="ado-rail" aria-label="Project navigation">
@@ -119,9 +124,12 @@ export function createRunPage(options: RunPageOptions): HTMLElement {
   };
 
   page.addEventListener('click', (e) => {
-    const el = (e.target as Element).closest<HTMLElement>('[data-tab], [data-open-report], [data-toggle]');
+    const el = (e.target as Element).closest<HTMLElement>(
+      '[data-tab], [data-open-report], [data-toggle], [data-theme-toggle]',
+    );
     if (!el) return;
-    if (el.dataset.tab) show(el.dataset.tab as RunTab);
+    if (el.hasAttribute('data-theme-toggle')) options.onToggleTheme?.();
+    else if (el.dataset.tab) show(el.dataset.tab as RunTab);
     else if (el.dataset.openReport) openReport(el.dataset.openReport);
     else if (el.dataset.toggle) {
       const target = page.querySelector<HTMLElement>(`#${el.dataset.toggle}`)!;
@@ -138,6 +146,13 @@ export function createRunPage(options: RunPageOptions): HTMLElement {
     next.focus();
     show(next.dataset.tab as RunTab);
   });
+
+  // The theme lives on <html> (set by .storybook/preview.ts); mirror it on the toggle.
+  const themeButton = page.querySelector<HTMLElement>('[data-theme-toggle]')!;
+  const syncThemeButton = () =>
+    themeButton.setAttribute('aria-pressed', String(document.documentElement.dataset.adoTheme === 'dark'));
+  new MutationObserver(syncThemeButton).observe(document.documentElement, { attributeFilter: ['data-ado-theme'] });
+  syncThemeButton();
 
   show(options.tab);
   return page;
