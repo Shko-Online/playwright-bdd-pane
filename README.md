@@ -2,6 +2,8 @@
 
 Publish [playwright-bdd](https://vitalets.github.io/playwright-bdd/) HTML reports from Azure Pipelines and review them in a **Playwright BDD** tab on the run page. Reviewers don't need to download anything. User-facing docs live in [overview.md](overview.md), which is also the Marketplace page.
 
+**[Try the interactive demo](https://shko-online.github.io/playwright-bdd-pane/iframe.html?id=demo-pipeline-run--run-20261110-1&viewMode=story)**: pipeline run #20261110.1 of the sample project, recreated in [Storybook](https://shko-online.github.io/playwright-bdd-pane/) with the real **Playwright BDD** tab. Nothing to install.
+
 ## Screenshots
 
 These come from a run of the [sample project](samples/demo), which has one deliberately failing scenario. Its full pipeline is [samples/demo/azure-pipelines.yml](samples/demo/azure-pipelines.yml). In the snippets below, the sample's `$(demoDir)/` path prefix is left out.
@@ -80,6 +82,7 @@ Report pages are served from `blob:` URLs, which can't act as a base for relativ
 | [src/viewer](src/viewer) | Archive loading, `ReportHost`, shim, and viewer UI (shared with the dev harness) |
 | [src/shared/constants.ts](src/shared/constants.ts) | Attachment type and manifest format shared by the task and the tab |
 | [src/dev](src/dev) | Local harness that runs the viewer without Azure DevOps |
+| [stories](stories) | Storybook: the demo of run #20261110.1 (its real report zips in [stories/assets](stories/assets)) and the viewer's states |
 | [samples/demo](samples/demo) | playwright-bdd sample project and an example `azure-pipelines.yml` |
 | [vss-extension.json](vss-extension.json) | Extension manifest |
 
@@ -95,8 +98,11 @@ npm install
 npm run fixtures   # runs the real task against the sample reports → .fixtures/*.zip
 npm run dev        # http://localhost:5173/host.html  (viewer in a cross-origin sandboxed iframe)
                    # http://localhost:5173/dev.html   (viewer top-level, handy for devtools)
+npm run storybook  # http://localhost:6006  (demo run page and the viewer's states)
 npm run typecheck
 ```
+
+Every push to `main` publishes the Storybook to GitHub Pages ([.github/workflows/storybook.yml](.github/workflows/storybook.yml)).
 
 ## Releases
 

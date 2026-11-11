@@ -2,6 +2,8 @@
 
 Review [playwright-bdd](https://vitalets.github.io/playwright-bdd/) test reports right inside Azure Pipelines. Publish the report from your pipeline, open the run, and select the **Playwright BDD** tab. You don't have to download or unzip any artifacts.
 
+**[Try it first in the interactive demo](https://shko-online.github.io/playwright-bdd-pane/iframe.html?id=demo-pipeline-run--run-20261110-1&viewMode=story)**: a recreated pipeline run with the real tab, no installation needed.
+
 ## What you get
 
 - **A pipeline task** (`PublishPlaywrightBddReport@1`) that attaches your HTML report to the run.
