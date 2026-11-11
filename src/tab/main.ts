@@ -136,7 +136,10 @@ async function main(): Promise<void> {
     const viewer = new ReportViewer(root, new BuildAttachmentSource(project, build.id), {
       onLayout: () => {
         // Build result tabs normally get a full-height frame. If the host collapsed us, ask for room.
-        if (window.innerHeight < 400) SDK.resize(undefined, 800);
+        // Only the height: SDK.resize turns a missing width into the current body width, and the
+        // host would pin the frame to it, so it stops following the window. NaN is sent as null,
+        // the host writes "nullpx", the browser ignores that, and the width stays fluid.
+        if (window.innerHeight < 400) SDK.resize(Number.NaN, 800);
       },
     });
     await SDK.notifyLoadSucceeded();
