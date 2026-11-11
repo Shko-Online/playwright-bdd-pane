@@ -1,0 +1,585 @@
+/*
+  Theme tokens of the Azure DevOps web UI. The real extension frame receives these from the
+  SDK (applyTheme), and src/tab/tab.css reads them at :root, so they are defined there too.
+  Dark values were read from the dark theme of dev.azure.com.
+*/
+:root {
+  --background-color: rgba(255, 255, 255, 1);
+  --text-primary-color: rgba(0, 0, 0, 0.9);
+  --text-secondary-color: rgba(0, 0, 0, 0.55);
+  --palette-neutral-2: 248, 248, 248;
+  --palette-neutral-4: 244, 244, 244;
+  --palette-neutral-8: 234, 234, 234;
+  --palette-neutral-10: 218, 218, 218;
+  --communication-background: rgba(0, 120, 212, 1);
+  --communication-foreground: rgba(0, 90, 158, 1);
+  --status-error-foreground: rgba(205, 74, 69, 1);
+
+  --ado-page: rgba(var(--palette-neutral-2), 1);
+  --ado-card: var(--background-color);
+  --ado-chrome: var(--background-color);
+  --ado-rail: rgba(234, 234, 234, 1);
+  --ado-border: rgba(var(--palette-neutral-8), 1);
+  --ado-hover: rgba(0, 0, 0, 0.04);
+  --ado-accent: var(--communication-background);
+  --ado-link: var(--communication-foreground);
+  --ado-status-failed: rgba(205, 74, 69, 1);
+  --ado-status-succeeded: rgba(51, 153, 71, 1);
+  --ado-status-warning: rgba(255, 185, 0, 1);
+  --ado-code-bg: rgba(var(--palette-neutral-4), 1);
+  --ado-shadow: 0 1.6px 3.6px rgba(0, 0, 0, 0.13), 0 0.3px 0.9px rgba(0, 0, 0, 0.11);
+  --ado-banner-bg: rgba(222, 236, 249, 1);
+  color-scheme: light;
+}
+
+:root[data-ado-theme="dark"] {
+  --background-color: rgba(32, 31, 30, 1);
+  --text-primary-color: rgba(255, 255, 255, 0.95);
+  --text-secondary-color: rgba(255, 255, 255, 0.8);
+  --palette-neutral-2: 37, 36, 35;
+  --palette-neutral-4: 41, 40, 39;
+  --palette-neutral-8: 59, 58, 57;
+  --palette-neutral-10: 72, 70, 68;
+  --communication-background: rgba(0, 120, 212, 1);
+  --communication-foreground: rgba(152, 198, 255, 1);
+  --status-error-foreground: rgba(241, 112, 123, 1);
+
+  --ado-page: rgba(var(--palette-neutral-2), 1);
+  --ado-card: rgba(32, 31, 30, 1);
+  --ado-chrome: rgba(32, 31, 30, 1);
+  --ado-rail: rgba(59, 58, 57, 1);
+  --ado-hover: rgba(255, 255, 255, 0.06);
+  --ado-status-failed: rgba(241, 112, 123, 1);
+  --ado-status-succeeded: rgba(146, 195, 83, 1);
+  --ado-code-bg: rgba(var(--palette-neutral-4), 1);
+  --ado-shadow: 0 1.6px 3.6px rgba(0, 0, 0, 0.4), 0 0.3px 0.9px rgba(0, 0, 0, 0.3);
+  --ado-banner-bg: rgba(0, 52, 92, 1);
+  color-scheme: dark;
+}
+
+html,
+body {
+  margin: 0;
+  height: 100%;
+  background: var(--ado-page);
+  color: var(--text-primary-color);
+  font-family: "Segoe UI", -apple-system, BlinkMacSystemFont, Roboto, "Helvetica Neue", sans-serif;
+  font-size: 14px;
+}
+
+.ado {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  height: 100dvh;
+  background: var(--ado-page);
+  color: var(--text-primary-color);
+}
+
+.ado a {
+  color: var(--ado-link);
+}
+
+.ado-icon {
+  flex: none;
+  vertical-align: -3px;
+}
+
+.ado-muted {
+  color: var(--text-secondary-color);
+}
+
+/* --- demo strip -------------------------------------------------------------- */
+
+.ado-demo-banner {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 12px;
+  padding: 8px 16px;
+  background: var(--ado-banner-bg);
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+.ado-demo-banner > span:first-of-type {
+  flex: 1 1 320px;
+}
+
+.ado-demo-links {
+  display: flex;
+  gap: 16px;
+}
+
+.ado-demo-links a {
+  font-weight: 600;
+  white-space: nowrap;
+  text-decoration: none;
+}
+
+.ado-demo-links a:hover {
+  text-decoration: underline;
+}
+
+/* --- top bar and project navigation ---------------------------------------- */
+
+.ado-topbar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  height: 48px;
+  padding: 0 16px;
+  background: var(--ado-chrome);
+  border-bottom: 1px solid var(--ado-border);
+  flex: none;
+}
+
+.ado-logo {
+  display: flex;
+}
+
+.ado-breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+.ado-breadcrumb > span:not(.ado-sep) {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.ado-sep {
+  color: var(--text-secondary-color);
+}
+
+.ado-search {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 200px;
+  height: 30px;
+  padding: 0 8px;
+  border: 1px solid var(--ado-border);
+  border-radius: 2px;
+  color: var(--text-secondary-color);
+  box-sizing: border-box;
+}
+
+.ado-topbar-icon {
+  display: flex;
+  color: var(--text-secondary-color);
+}
+
+.ado-body {
+  display: flex;
+  flex: 1;
+  min-height: 0;
+}
+
+.ado-rail {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  width: 48px;
+  padding-top: 8px;
+  background: var(--ado-rail);
+  flex: none;
+}
+
+.ado-project-avatar {
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  margin-bottom: 8px;
+  border-radius: 4px;
+  background: #c4314b;
+  color: #fff;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.ado-rail-item {
+  display: grid;
+  place-items: center;
+  width: 48px;
+  height: 40px;
+  color: var(--text-secondary-color);
+}
+
+.ado-rail-item svg {
+  width: 20px;
+  height: 20px;
+}
+
+.ado-rail-item.is-active {
+  color: var(--ado-accent);
+  box-shadow: inset 3px 0 0 var(--ado-accent);
+  background: var(--ado-hover);
+}
+
+/* --- run page ------------------------------------------------------------------ */
+
+.ado-page {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-width: 0;
+  padding: 20px 32px 16px;
+  box-sizing: border-box;
+}
+
+.ado-run-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: 12px;
+  flex: none;
+}
+
+.ado-run-status {
+  display: flex;
+  padding-top: 2px;
+}
+
+.ado-run-title {
+  flex: 1 1 300px;
+  min-width: 0;
+}
+
+.ado-run-title h1 {
+  margin: 0 0 2px;
+  font-size: 21px;
+  font-weight: 600;
+  line-height: 1.3;
+}
+
+.ado-run-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.ado-button {
+  font: inherit;
+  font-weight: 600;
+  padding: 6px 12px;
+  border: none;
+  border-radius: 2px;
+  color: inherit;
+  background: rgba(var(--palette-neutral-4), 1);
+}
+
+.ado-button-primary {
+  color: #fff;
+  background: var(--ado-accent);
+}
+
+.ado-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.ado-tabs {
+  display: flex;
+  gap: 8px;
+  margin: 20px 0 16px;
+  flex: none;
+  overflow-x: auto;
+}
+
+.ado-tab {
+  font: inherit;
+  padding: 8px 4px;
+  margin-right: 12px;
+  border: none;
+  background: none;
+  color: inherit;
+  cursor: pointer;
+  box-shadow: inset 0 -2px 0 transparent;
+  white-space: nowrap;
+}
+
+.ado-tab:hover {
+  color: var(--text-primary-color);
+  box-shadow: inset 0 -2px 0 var(--ado-border);
+}
+
+.ado-tab[aria-selected="true"] {
+  font-weight: 600;
+  box-shadow: inset 0 -2px 0 var(--ado-accent);
+}
+
+.ado-tab:focus-visible,
+.ado-link:focus-visible,
+.ado-job:focus-visible,
+.ado-test-row:focus-visible {
+  outline: 2px solid var(--ado-accent);
+  outline-offset: 1px;
+}
+
+.ado-panel {
+  flex: 1;
+  min-height: 0;
+}
+
+.ado-scroll {
+  overflow: auto;
+}
+
+/* The extension's area: in Azure DevOps this is an iframe filling the rest of the page. */
+.ado-extension {
+  display: flex;
+  flex-direction: column;
+  background: var(--background-color);
+  box-shadow: var(--ado-shadow);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.ado-extension[hidden] {
+  display: none;
+}
+
+.ado-extension-root {
+  flex: 1;
+  min-height: 0;
+}
+
+.ado-extension-root.pbdd {
+  height: auto;
+  min-height: 0;
+}
+
+/* --- summary ---------------------------------------------------------------- */
+
+.ado-card {
+  background: var(--ado-card);
+  box-shadow: var(--ado-shadow);
+  border-radius: 4px;
+  padding: 16px 20px;
+  margin-bottom: 16px;
+}
+
+.ado-card h2 {
+  margin: 0 0 12px;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.ado-count {
+  display: inline-block;
+  min-width: 18px;
+  margin: 0 12px 0 4px;
+  padding: 0 6px;
+  border-radius: 9px;
+  background: rgba(var(--palette-neutral-8), 1);
+  font-size: 12px;
+  text-align: center;
+}
+
+.ado-facts {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+  gap: 16px 24px;
+}
+
+.ado-fact-label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 6px;
+  color: var(--text-secondary-color);
+  font-size: 12px;
+}
+
+.ado-fact-value {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 600;
+}
+
+.ado-fact-sub {
+  margin-top: 4px;
+  color: var(--text-secondary-color);
+  font-size: 12px;
+  overflow-wrap: anywhere;
+}
+
+.ado-link {
+  font: inherit;
+  padding: 0;
+  border: none;
+  background: none;
+  color: var(--ado-link);
+  cursor: pointer;
+}
+
+.ado-link:hover {
+  text-decoration: underline;
+}
+
+.ado-issues,
+.ado-steps,
+.ado-tests {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.ado-issue {
+  display: flex;
+  gap: 10px;
+  padding: 8px 0;
+  line-height: 1.4;
+  border-top: 1px solid var(--ado-border);
+}
+
+.ado-issue:first-child {
+  border-top: none;
+}
+
+.ado-job,
+.ado-test-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 8px 4px;
+  font: inherit;
+  color: inherit;
+  text-align: left;
+  border: none;
+  background: none;
+  cursor: pointer;
+  border-radius: 2px;
+}
+
+.ado-job:hover,
+.ado-test-row:hover {
+  background: var(--ado-hover);
+}
+
+.ado-job-name,
+.ado-test-name {
+  flex: 1;
+  min-width: 0;
+  font-weight: 600;
+}
+
+.ado-chevron {
+  display: flex;
+  transition: transform 0.15s;
+}
+
+[aria-expanded="true"] > .ado-chevron {
+  transform: rotate(90deg);
+}
+
+.ado-steps {
+  padding-left: 28px;
+}
+
+.ado-step {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 8px;
+  border-radius: 2px;
+}
+
+.ado-step.is-highlighted {
+  background: var(--ado-hover);
+  box-shadow: inset 2px 0 0 var(--ado-accent);
+}
+
+.ado-step-name {
+  flex: 1;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.ado-task-ref {
+  display: block;
+  font-size: 12px;
+  color: var(--text-secondary-color);
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+}
+
+.ado-step-duration {
+  min-width: 36px;
+  text-align: right;
+}
+
+.ado-code {
+  margin: 0;
+  padding: 12px 16px;
+  overflow-x: auto;
+  border-radius: 4px;
+  background: var(--ado-code-bg);
+  font: 12px/1.5 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+}
+
+/* --- tests ---------------------------------------------------------------- */
+
+.ado-test-summary {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px 48px;
+}
+
+.ado-big {
+  font-size: 24px;
+  font-weight: 600;
+}
+
+.ado-passed {
+  color: var(--ado-status-succeeded);
+}
+
+.ado-failed {
+  color: var(--ado-status-failed);
+}
+
+.ado-tests-hint {
+  margin-top: 0;
+}
+
+.ado-test {
+  border-top: 1px solid var(--ado-border);
+}
+
+.ado-test-details {
+  padding: 4px 8px 12px 52px;
+}
+
+.ado-test-steps {
+  margin: 0 0 12px;
+  padding-left: 18px;
+  line-height: 1.6;
+}
+
+.ado-error {
+  color: var(--status-error-foreground);
+}
+
+/* --- narrow screens ------------------------------------------------------------ */
+
+@media (max-width: 720px) {
+  .ado-rail,
+  .ado-search {
+    display: none;
+  }
+  .ado-page {
+    padding: 16px;
+  }
+  .ado-breadcrumb > span:nth-child(-n + 4) {
+    display: none;
+  }
+}

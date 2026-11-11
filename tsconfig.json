@@ -11,5 +11,5 @@
     "noEmit": true,
     "types": []
   },
-  "include": ["src/**/*.ts"]
+  "include": ["src/**/*.ts", "stories/**/*.ts", ".storybook/*.ts"]
 }

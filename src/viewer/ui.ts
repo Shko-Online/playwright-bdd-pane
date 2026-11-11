@@ -59,6 +59,8 @@ export class ReportViewer {
   private readonly popups = new Map<Window, PopupReport>();
   private loadToken = 0;
   private pollTimer: number | undefined;
+  private disposed = false;
+  private readonly onMessage = (e: MessageEvent) => this.answerPopup(e);
 
   constructor(
     root: HTMLElement,
@@ -98,17 +100,20 @@ export class ReportViewer {
     this.picker.addEventListener('change', () => this.select(this.picker.value));
     this.openButton.addEventListener('click', () => this.openInNewTab());
     this.refreshButton.addEventListener('click', () => this.refresh());
-    window.addEventListener('message', (e) => this.answerPopup(e));
+    window.addEventListener('message', this.onMessage);
     root.querySelector('.pbdd-notice-close')!.addEventListener('click', () => (this.notice.hidden = true));
   }
 
   /** (Re)load the list of reports and show the selected one. */
   async refresh(): Promise<void> {
+    if (this.disposed) return;
     window.clearTimeout(this.pollTimer);
     this.setStatus('Looking for published reports…', 'busy');
     try {
       this.refs = await this.source.list();
+      if (this.disposed) return;
     } catch (err) {
+      if (this.disposed) return;
       this.setStatus(`Could not list the published reports. ${describe(err)}`, 'error');
       return;
     }
@@ -135,19 +140,25 @@ export class ReportViewer {
     this.renderPicker();
     await this.select((keep ?? this.refs[0]).id, true);
 
+    if (this.disposed) return;
     if (this.source.mayPublishMore?.()) {
       // Pick up reports from jobs that have not finished yet, without disturbing the current view.
       this.pollTimer = window.setTimeout(() => this.pollForNewReports(), this.options.pollIntervalMs ?? 15_000);
     }
   }
 
+  /** Stops polling, drops pending loads and releases the report's blob URLs. */
   dispose(): void {
+    this.disposed = true;
+    this.loadToken++;
     window.clearTimeout(this.pollTimer);
+    window.removeEventListener('message', this.onMessage);
     this.host?.dispose();
     this.host = undefined;
   }
 
   private async pollForNewReports(): Promise<void> {
+    if (this.disposed) return;
     try {
       const refs = await this.source.list();
       if (refs.length !== this.refs.length) {
@@ -157,7 +168,7 @@ export class ReportViewer {
     } catch {
       // transient; try again next time
     }
-    if (this.source.mayPublishMore?.()) {
+    if (!this.disposed && this.source.mayPublishMore?.()) {
       this.pollTimer = window.setTimeout(() => this.pollForNewReports(), this.options.pollIntervalMs ?? 15_000);
     }
   }

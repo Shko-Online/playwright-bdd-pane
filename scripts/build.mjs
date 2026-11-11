@@ -3,6 +3,7 @@
 //   build/tasks/PublishPlaywrightBddReport/  the pipeline task (bundled + production node_modules)
 // `--dev` also emits the local harness (dev.html / host.html) with inline source maps.
 // `--version x.y.z` stamps that version into the packaged task.json (used by releases).
+// `--web-only` builds just build/web/ (Storybook serves report.html from it).
 import * as esbuild from 'esbuild';
 import { execSync } from 'node:child_process';
 import fs from 'node:fs';
@@ -11,6 +12,7 @@ import { fileURLToPath } from 'node:url';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const dev = process.argv.includes('--dev');
+const webOnly = process.argv.includes('--web-only');
 const versionArg = process.argv.indexOf('--version');
 const version = versionArg > 0 ? process.argv[versionArg + 1] : undefined;
 if (version !== undefined && !/^\d+\.\d+\.\d+$/.test(version)) {
@@ -21,9 +23,8 @@ const web = path.join(out, 'web');
 const taskSrc = path.join(root, 'tasks', 'PublishPlaywrightBddReport');
 const taskOut = path.join(out, 'tasks', 'PublishPlaywrightBddReport');
 
-fs.rmSync(out, { recursive: true, force: true });
+fs.rmSync(webOnly ? web : out, { recursive: true, force: true });
 fs.mkdirSync(web, { recursive: true });
-fs.mkdirSync(taskOut, { recursive: true });
 
 const copy = (from, to) => fs.copyFileSync(path.join(root, from), to);
 
@@ -49,7 +50,13 @@ if (dev) {
   copy('src/dev/host.html', path.join(web, 'host.html'));
 }
 
+if (webOnly) {
+  console.log(`Built ${path.relative(root, web)}/`);
+  process.exit(0);
+}
+
 // --- pipeline task -----------------------------------------------------------
+fs.mkdirSync(taskOut, { recursive: true });
 await esbuild.build({
   entryPoints: [path.join(taskSrc, 'src/index.ts')],
   outfile: path.join(taskOut, 'index.js'),

@@ -4,3 +4,4 @@ out/
 .fixtures/
 *.vsix
 .DS_Store
+*storybook.log
