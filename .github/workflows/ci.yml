@@ -9,7 +9,7 @@ permissions:
 
 jobs:
   build:
-    name: Typecheck and package
+    name: Typecheck, package and build Storybook
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
@@ -35,6 +35,9 @@ jobs:
 
       - name: Package
         run: node scripts/package.mjs --version 0.0.1
+
+      - name: Build Storybook
+        run: npm run build-storybook
 
       - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
