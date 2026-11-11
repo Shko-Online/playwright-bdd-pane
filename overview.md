@@ -11,6 +11,32 @@ Review [playwright-bdd](https://vitalets.github.io/playwright-bdd/) test reports
 - **Traces in one click.** *View trace* opens the trace in the [Playwright Trace Viewer](https://trace.playwright.dev). The trace goes straight from your browser to the viewer, and nothing is saved to disk.
 - Works with the **Cucumber HTML report** (`cucumberReporter('html')`) and with **Playwright's HTML report**. Publish both and switch between them in the tab.
 
+## Screenshots
+
+From a run of the [sample project](https://github.com/Shko-Online/playwright-bdd-pane/tree/main/samples/demo), which has one deliberately failing scenario.
+
+**Cucumber report.** The run page gets a **Playwright BDD** tab with the summary, the run's commit and branch, and every feature and scenario.
+
+![Cucumber report in the Playwright BDD tab](docs/images/cucumber-report.png)
+
+Filter by status to go straight to failures. Each failed step shows its error, the call log, and the source line.
+
+![Failed scenario with its error in the Cucumber report](docs/images/cucumber-failed.png)
+
+**Playwright report.** Publish Playwright's own HTML report with a second task, and switch between the reports with the picker in the tab's toolbar.
+
+![Playwright report in the Playwright BDD tab](docs/images/playwright-report.png)
+
+Test details work as they do locally: errors, test steps, and attachments.
+
+![Failed test details in the Playwright report](docs/images/playwright-test.png)
+
+![Screenshot attachment of the failed test](docs/images/playwright-screenshot.png)
+
+**View Trace** opens the test's trace in the Playwright Trace Viewer, straight from the tab.
+
+![Trace of the failed test in the Playwright Trace Viewer](docs/images/trace-viewer.png)
+
 ## Get started
 
 1. Configure the playwright-bdd HTML reporter in `playwright.config.ts`:
@@ -41,6 +67,16 @@ Review [playwright-bdd](https://vitalets.github.io/playwright-bdd/) test reports
    ```
 
 3. Run the pipeline, open the run, and select the **Playwright BDD** tab.
+
+To also publish Playwright's HTML report (`['html', { outputFolder: 'playwright-report' }]` in the reporters), add a second task:
+
+```yaml
+- task: PublishPlaywrightBddReport@1
+  condition: succeededOrFailed()
+  inputs:
+    reportDir: playwright-report
+    reportName: Playwright report
+```
 
 ## Task inputs
 
