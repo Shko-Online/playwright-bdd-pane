@@ -4,6 +4,8 @@
 //   build/tasks/PublishPlaywrightBddReport/  the pipeline task (bundled + production node_modules)
 // `--dev` also emits the local harness (dev.html / host.html) with inline source maps.
 // `--version x.y.z` stamps that version into the packaged task.json (used by releases).
+// `--dev-task` gives the packaged task the identity of the private "-dev" extension
+// (tasks/PublishPlaywrightBddReport/task.dev.json), so it can be installed next to the public one.
 // `--web-only` builds just build/web/ (Storybook serves report.html from it).
 import * as esbuild from 'esbuild';
 import { execSync } from 'node:child_process';
@@ -15,6 +17,7 @@ import { buildTraceViewer, traceViewerLogo, traceViewerVersion } from './trace-v
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const dev = process.argv.includes('--dev');
 const webOnly = process.argv.includes('--web-only');
+const devTask = process.argv.includes('--dev-task');
 const versionArg = process.argv.indexOf('--version');
 const version = versionArg > 0 ? process.argv[versionArg + 1] : undefined;
 if (version !== undefined && !/^\d+\.\d+\.\d+$/.test(version)) {
@@ -82,12 +85,15 @@ await esbuild.build({
 for (const f of ['task.json', 'icon.png', 'package.json', 'package-lock.json']) {
   copy(path.join('tasks/PublishPlaywrightBddReport', f), path.join(taskOut, f));
 }
-if (version) {
-  // Agents cache tasks by version, so every release must carry a new task version too.
+if (version || devTask) {
   const taskJson = path.join(taskOut, 'task.json');
-  const task = JSON.parse(fs.readFileSync(taskJson, 'utf8'));
-  const [Major, Minor, Patch] = version.split('.').map(Number);
-  task.version = { Major, Minor, Patch };
+  let task = JSON.parse(fs.readFileSync(taskJson, 'utf8'));
+  if (version) {
+    // Agents cache tasks by version, so every release must carry a new task version too.
+    const [Major, Minor, Patch] = version.split('.').map(Number);
+    task.version = { Major, Minor, Patch };
+  }
+  if (devTask) task = { ...task, ...JSON.parse(fs.readFileSync(path.join(taskSrc, 'task.dev.json'), 'utf8')) };
   fs.writeFileSync(taskJson, JSON.stringify(task, null, 2) + '\n');
 }
 // Don't let the npm_config_* settings of an outer `npm run` leak into this install.

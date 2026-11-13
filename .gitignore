@@ -5,3 +5,4 @@ out/
 *.vsix
 .DS_Store
 *storybook.log
+vss-extension.dev.generated.json
