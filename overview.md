@@ -8,7 +8,7 @@ Review [playwright-bdd](https://vitalets.github.io/playwright-bdd/) test reports
 
 - **A pipeline task** (`PublishPlaywrightBddReport@1`) that attaches your HTML report to the run.
 - **A "Playwright BDD" tab** on the run page that renders the report: features, scenarios, steps, errors, and screenshots.
-- **Traces in one click.** *View trace* opens the trace in the [Playwright Trace Viewer](https://trace.playwright.dev). The trace goes straight from your browser to the viewer, and nothing is saved to disk.
+- **Traces in one click.** *View trace* opens the trace in the Playwright Trace Viewer, right inside the tab. The viewer ships with the extension: the trace stays in your browser, and nothing is saved to disk.
 - Works with the **Cucumber HTML report** (`cucumberReporter('html')`) and with **Playwright's HTML report**. Publish both and switch between them in the tab.
 
 ## Screenshots
@@ -33,7 +33,7 @@ Test details work as they do locally: errors, test steps, and attachments.
 
 ![Screenshot attachment of the failed test](docs/images/playwright-screenshot.png)
 
-**View Trace** opens the test's trace in the Playwright Trace Viewer, straight from the tab.
+**View Trace** opens the test's trace in the Playwright Trace Viewer, inside the tab. **Back to report** takes you back where you were.
 
 ![Trace of the failed test in the Playwright Trace Viewer](docs/images/trace-viewer.png)
 
@@ -96,7 +96,7 @@ To also publish Playwright's HTML report (`['html', { outputFolder: 'playwright-
 
 ## Privacy
 
-The extension has no telemetry. Reports are downloaded from your Azure DevOps organization and unpacked in your browser. *View trace* sends that trace to the [Playwright Trace Viewer](https://trace.playwright.dev), and only when you click it.
+The extension has no telemetry. Reports are downloaded from your Azure DevOps organization and unpacked in your browser. Traces open in the Playwright Trace Viewer that comes with the extension, so they never leave your browser either.
 
 ## Built for free by Shko Online
 

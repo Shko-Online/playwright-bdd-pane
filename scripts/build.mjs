@@ -1,5 +1,6 @@
 // Builds everything the .vsix needs into build/:
 //   build/web/                         the build results tab (bundled)
+//   build/web/trace/                   the Playwright Trace Viewer, from playwright-core (see scripts/trace-viewer.mjs)
 //   build/tasks/PublishPlaywrightBddReport/  the pipeline task (bundled + production node_modules)
 // `--dev` also emits the local harness (dev.html / host.html) with inline source maps.
 // `--version x.y.z` stamps that version into the packaged task.json (used by releases).
@@ -9,6 +10,7 @@ import { execSync } from 'node:child_process';
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { buildTraceViewer, traceViewerLogo, traceViewerVersion } from './trace-viewer.mjs';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const dev = process.argv.includes('--dev');
@@ -37,12 +39,19 @@ const browser = {
   sourcemap: dev ? 'inline' : false,
   legalComments: 'eof',
   logLevel: 'warning',
+  // The Trace Viewer's version, for its license notice (src/viewer/upsell.ts), and its logo,
+  // which the tab hands to the viewer page (src/viewer/trace.ts).
+  define: {
+    __TRACE_VIEWER_VERSION__: JSON.stringify(traceViewerVersion),
+    __TRACE_VIEWER_LOGO__: JSON.stringify(traceViewerLogo),
+  },
 };
 await esbuild.build({ ...browser, entryPoints: [path.join(root, 'src/tab/main.ts')], outfile: path.join(web, 'tab.js') });
 await esbuild.build({ ...browser, entryPoints: [path.join(root, 'src/tab/report.ts')], outfile: path.join(web, 'report.js') });
 copy('src/tab/tab.html', path.join(web, 'tab.html'));
 copy('src/tab/report.html', path.join(web, 'report.html'));
 copy('src/tab/tab.css', path.join(web, 'tab.css'));
+buildTraceViewer(path.join(web, 'trace'));
 
 if (dev) {
   await esbuild.build({ ...browser, entryPoints: [path.join(root, 'src/dev/dev.ts')], outfile: path.join(web, 'dev.js') });

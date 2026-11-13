@@ -1,6 +1,7 @@
 import { loadArchive } from './archive';
 import { ReportHost } from './host';
 import type { Scheme } from './theme';
+import { TracePanel } from './trace';
 import { createUpsellLink } from './upsell';
 
 export interface ReportRef {
@@ -52,6 +53,7 @@ export class ReportViewer {
   private readonly notice: HTMLElement;
   private readonly status: HTMLElement;
   private readonly frame: HTMLIFrameElement;
+  private readonly trace: TracePanel;
 
   private refs: ReportRef[] = [];
   private selectedId: string | undefined;
@@ -96,6 +98,7 @@ export class ReportViewer {
     this.notice = root.querySelector('.pbdd-notice')!;
     this.status = root.querySelector('.pbdd-status')!;
     this.frame = root.querySelector('.pbdd-frame')!;
+    this.trace = new TracePanel(root.querySelector('.pbdd-stage')!, (m) => this.showNotice(m));
     root.querySelector('.pbdd-actions')!.append(createUpsellLink());
     this.frame.setAttribute('sandbox', FRAME_SANDBOX);
     this.frame.setAttribute('allow', 'clipboard-write; fullscreen');
@@ -156,6 +159,7 @@ export class ReportViewer {
     this.loadToken++;
     window.clearTimeout(this.pollTimer);
     window.removeEventListener('message', this.onMessage);
+    this.trace.close();
     this.host?.dispose();
     this.host = undefined;
   }
@@ -196,6 +200,7 @@ export class ReportViewer {
     this.selectedId = id;
     this.picker.value = id;
     const token = ++this.loadToken;
+    this.trace.close();
 
     this.openButton.disabled = true;
     this.meta.textContent = this.refs.length < 2 ? ref.label : '';
@@ -216,6 +221,7 @@ export class ReportViewer {
       this.host = new ReportHost(archive, {
         onNotice: (m) => this.showNotice(m),
         onOpenPage: (path, hash) => this.openInNewTab(path, hash),
+        onOpenTrace: (trace) => this.trace.open(trace),
         runUrlTemplate: this.source.runUrlTemplate?.(),
       });
       this.current = { data, name: ref.label, runUrlTemplate: this.source.runUrlTemplate?.() };

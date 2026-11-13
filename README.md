@@ -52,7 +52,7 @@ Test details work as they do locally: errors, test steps, and attachments.
 
 ![Screenshot attachment of the failed test](docs/images/playwright-screenshot.png)
 
-**View Trace** opens the test's trace in the [Playwright Trace Viewer](https://trace.playwright.dev). The trace goes straight from the tab to the viewer, so nothing is downloaded.
+**View Trace** opens the test's trace in the Playwright Trace Viewer, inside the tab. The viewer ships with the extension, so the trace never leaves the browser and no outside service is involved. **Back to report** returns to the report where you left it, and **Open trace in new tab** gives the trace a full browser tab.
 
 ![Trace of the failed test in the Playwright Trace Viewer](docs/images/trace-viewer.png)
 
@@ -68,12 +68,12 @@ Test details work as they do locally: errors, test steps, and attachments.
 └──────────────────────────────┘                 │  • ReportHost: archive path → blob: URL       │
                                                  │  • <iframe src=blob:…index.html>              │
                                                  │      └ shim rewrites relative URLs to blobs   │
-                                                 │  • "View trace" → trace.playwright.dev        │
-                                                 │      via postMessage (Blob, no download)      │
+                                                 │  • "View trace" → trace/index.html (bundled   │
+                                                 │      Trace Viewer), Blob via postMessage      │
                                                  └───────────────────────────────────────────────┘
 ```
 
-Report pages are served from `blob:` URLs, which can't act as a base for relative URLs. So a small shim ([src/viewer/shim.ts](src/viewer/shim.ts)) is injected at the top of every HTML page. It patches `fetch`, XHR, `URL`, `window.open`, the `src`/`href` setters, and adds a `MutationObserver`, so references like `data/abc.png` resolve to blob URLs served by [ReportHost](src/viewer/host.ts). The trace viewer bundled inside a report needs a service worker and can't run from a blob. Instead, trace links open trace.playwright.dev and the trace is handed over with its `postMessage` load API.
+Report pages are served from `blob:` URLs, which can't act as a base for relative URLs. So a small shim ([src/viewer/shim.ts](src/viewer/shim.ts)) is injected at the top of every HTML page. It patches `fetch`, XHR, `URL`, `window.open`, the `src`/`href` setters, and adds a `MutationObserver`, so references like `data/abc.png` resolve to blob URLs served by [ReportHost](src/viewer/host.ts). The trace viewer bundled inside a report needs a service worker and can't run from a blob. Instead, the extension ships the Playwright Trace Viewer (`web/trace/`), copied as published from the `playwright-core` npm package by [scripts/trace-viewer.mjs](scripts/trace-viewer.mjs). Trace links open it in a panel over the report ([src/viewer/trace.ts](src/viewer/trace.ts)), and the trace is handed over with the viewer's `postMessage` load API.
 
 | Path | What |
 | --- | --- |
@@ -101,6 +101,8 @@ npm run dev        # http://localhost:5173/host.html  (viewer in a cross-origin 
 npm run storybook  # http://localhost:6006  (demo run page and the viewer's states)
 npm run typecheck
 ```
+
+To update the Playwright Trace Viewer, change the version of `playwright-core` in [package.json](package.json).
 
 Every push to `main` publishes the Storybook to GitHub Pages ([.github/workflows/storybook.yml](.github/workflows/storybook.yml)).
 
@@ -145,3 +147,7 @@ It requires a policy on the `shko-online` publisher (Marketplace → publisher �
 npm run package -- --version 1.2.3   # out/shko-online.playwright-bdd-pane-1.2.3.vsix (public)
 npm run package:dev -- --version 1.2.3   # private "-dev" variant, for testing in one organization
 ```
+
+## License
+
+[MIT](LICENSE). The extension also ships the Playwright Trace Viewer from the [`playwright-core`](https://www.npmjs.com/package/playwright-core) npm package, unmodified. It is © Microsoft Corporation and licensed under the Apache License 2.0; its LICENSE and NOTICE are distributed with it in `web/trace/`.

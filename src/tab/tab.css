@@ -325,3 +325,64 @@ body {
     animation: none;
   }
 }
+
+/* --- Trace viewer (see src/viewer/trace.ts) --------------------------------- */
+
+.pbdd-trace {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  background: var(--pbdd-bg);
+}
+
+.pbdd-trace-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 16px;
+  border-bottom: 1px solid var(--pbdd-border);
+}
+
+.pbdd-trace-frame {
+  flex: 1;
+  min-height: 0;
+  height: auto;
+}
+
+/* --- Third-party notice in the "Built for free by Shko Online" dialog ------- */
+
+.pbdd-upsell-legal {
+  margin-top: 16px;
+  padding-top: 12px;
+  border-top: 1px solid var(--pbdd-border);
+  font-size: 12px;
+  color: var(--pbdd-muted);
+}
+
+.pbdd-upsell-legal h3 {
+  margin: 0 0 8px;
+  font-size: 13px;
+  color: var(--pbdd-fg);
+}
+
+.pbdd-upsell-legal p {
+  margin: 0 0 8px;
+}
+
+.pbdd-upsell-license summary {
+  cursor: pointer;
+  color: var(--pbdd-link);
+}
+
+.pbdd-upsell-license pre {
+  max-height: 240px;
+  overflow: auto;
+  margin: 8px 0 0;
+  padding: 8px;
+  border: 1px solid var(--pbdd-border);
+  border-radius: 2px;
+  font-size: 11px;
+  white-space: pre-wrap;
+}

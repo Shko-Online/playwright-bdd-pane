@@ -12,6 +12,7 @@ import type { PopupReport } from '../viewer/ui';
 import { createUpsellLink } from '../viewer/upsell';
 import { showBanner } from '../shared/banner';
 import { luminance, setScheme } from '../viewer/theme';
+import { TracePanel } from '../viewer/trace';
 
 showBanner('Playwright BDD');
 
@@ -22,6 +23,13 @@ document.getElementById('actions')!.append(createUpsellLink());
 
 const state = new URLSearchParams(location.hash.slice(1));
 let host: ReportHost | undefined;
+
+function showNotice(message: string): void {
+  notice.querySelector('span')!.textContent = message;
+  notice.hidden = false;
+}
+
+const trace = new TracePanel(document.querySelector('.pbdd-stage')!, showNotice);
 
 function showStatus(text: string, kind: 'busy' | 'error'): void {
   status.textContent = text;
@@ -50,12 +58,11 @@ async function show({ data, name, runUrlTemplate, scheme }: PopupReport): Promis
   document.title = `${name} · Playwright BDD`;
   document.getElementById('title')!.textContent = name;
   host?.dispose();
+  trace.close();
   host = new ReportHost(archive, {
     runUrlTemplate,
-    onNotice: (m) => {
-      notice.querySelector('span')!.textContent = m;
-      notice.hidden = false;
-    },
+    onNotice: showNotice,
+    onOpenTrace: (t) => trace.open(t),
   });
   const page = state.get('page');
   const target = page && archive.files.has(page) ? page : archive.entry;

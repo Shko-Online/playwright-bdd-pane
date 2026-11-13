@@ -1,4 +1,6 @@
 import type { StorybookConfig } from '@storybook/html-vite';
+// @ts-expect-error: plain ES module without type declarations
+import { traceViewerLogo, traceViewerVersion } from '../scripts/trace-viewer.mjs';
 
 const config: StorybookConfig = {
   framework: '@storybook/html-vite',
@@ -12,6 +14,15 @@ const config: StorybookConfig = {
     { from: '../images', to: '/images' },
   ],
   core: { disableTelemetry: true },
+  // Same as scripts/build.mjs: the Trace Viewer's version and logo.
+  viteFinal: (config) => ({
+    ...config,
+    define: {
+      ...config.define,
+      __TRACE_VIEWER_VERSION__: JSON.stringify(traceViewerVersion),
+      __TRACE_VIEWER_LOGO__: JSON.stringify(traceViewerLogo),
+    },
+  }),
 };
 
 export default config;

@@ -10,7 +10,17 @@ const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const web = path.join(root, 'build', 'web');
 const fixtures = path.join(root, '.fixtures');
 const port = Number(process.env.PORT) || 5173;
-const types = { '.html': 'text/html', '.js': 'text/javascript', '.css': 'text/css', '.zip': 'application/zip', '.png': 'image/png' };
+const types = {
+  '.html': 'text/html',
+  '.js': 'text/javascript',
+  '.css': 'text/css',
+  '.zip': 'application/zip',
+  '.png': 'image/png',
+  '.svg': 'image/svg+xml',
+  '.ttf': 'font/ttf',
+  '.txt': 'text/plain',
+  '.md': 'text/markdown',
+};
 
 http
   .createServer((req, res) => {

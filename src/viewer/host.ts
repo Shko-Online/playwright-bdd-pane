@@ -1,8 +1,8 @@
 import type { ReportArchive } from './archive';
 import { extensionOf, isHtml } from './mime';
 import { shimScript } from './shim';
+import { openTraceInNewTab } from './trace';
 
-const TRACE_VIEWER_ORIGIN = 'https://trace.playwright.dev';
 const VIRTUAL_ORIGIN = 'https://report.invalid';
 
 export interface ReportHostEvents {
@@ -15,6 +15,12 @@ export interface ReportHostEvents {
    * the blob URL is opened directly, which works in a first-party page.
    */
   onOpenPage?(path: string, hash: string): void;
+  /**
+   * A report page asked to show a Playwright trace (the zip, from the report). The embedding
+   * UI shows it in the extension's trace viewer (see TracePanel). Without a handler the trace
+   * viewer opens in a new browser tab.
+   */
+  onOpenTrace?(trace: Blob): void;
   /**
    * URL of a pipeline run, with `{id}` in place of the build id. Lets links such as
    * Cucumber's `vstfs:///Build/Build/123` (its "Azure Pipelines" CI link) open the run.
@@ -101,9 +107,8 @@ export class ReportHost {
   }
 
   /**
-   * Opens Playwright traces in trace.playwright.dev. The trace viewer announces itself
-   * with `{method: 'ready'}` to its opener and accepts `{method: 'load', params: {trace}}`,
-   * so the trace goes straight from memory to the viewer — nothing is downloaded.
+   * Opens a Playwright trace in the trace viewer that comes with the extension (see trace.ts).
+   * The viewer shows one trace at a time; the first is the primary run.
    */
   openTrace(paths: string[]): void {
     const traces = paths.map((p) => this.archive.files.get(p)).filter((b): b is Blob => !!b);
@@ -111,26 +116,8 @@ export class ReportHost {
       this.events.onNotice?.('The trace file is not part of the published report.');
       return;
     }
-    const viewer = window.open(`${TRACE_VIEWER_ORIGIN}/`, '_blank');
-    if (!viewer) {
-      this.events.onNotice?.('The browser blocked the trace viewer window. Allow pop-ups for this site and try again.');
-      return;
-    }
-    let delivered = false;
-    const onMessage = (e: MessageEvent) => {
-      if (e.source !== viewer || e.data?.method !== 'ready') return;
-      delivered = true;
-      window.removeEventListener('message', onMessage);
-      // The viewer loads one trace at a time; the first is the primary run.
-      viewer.postMessage({ method: 'load', params: { trace: traces[0] } }, TRACE_VIEWER_ORIGIN);
-    };
-    window.addEventListener('message', onMessage);
-    setTimeout(() => {
-      window.removeEventListener('message', onMessage);
-      if (!delivered && !viewer.closed) {
-        this.events.onNotice?.('The trace viewer did not respond. Check that trace.playwright.dev is reachable from your network.');
-      }
-    }, 60_000);
+    if (this.events.onOpenTrace) this.events.onOpenTrace(traces[0]);
+    else openTraceInNewTab(traces[0], this.events.onNotice);
   }
 
   dispose(): void {
