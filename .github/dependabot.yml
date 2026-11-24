@@ -1,0 +1,36 @@
+# Weekly update pull requests for npm packages and pinned GitHub Actions.
+# Security updates (opened as soon as an advisory is published) use the same settings.
+#
+# Commit messages use the "build" type, which semantic-release does not release on.
+# To ship a dependency fix, merge it with a "fix(deps): …" squash title instead.
+version: 2
+updates:
+  - package-ecosystem: npm
+    directories:
+      - /
+      - /tasks/PublishPlaywrightBddReport
+    schedule:
+      interval: weekly
+    cooldown:
+      default-days: 7 # let new releases age a week before proposing them
+    commit-message:
+      prefix: build
+      include: scope
+    groups:
+      storybook:
+        patterns: ["storybook", "@storybook/*"]
+      semantic-release:
+        patterns: ["semantic-release", "@semantic-release/*", "conventional-changelog-*"]
+    open-pull-requests-limit: 10
+
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+    cooldown:
+      default-days: 7
+    commit-message:
+      prefix: ci
+    groups:
+      actions:
+        patterns: ["*"]
