@@ -30,7 +30,7 @@
     "semantic-release": "^25.0.9",
     "storybook": "^10.6.5",
     "tfx-cli": "^0.24.2",
-    "typescript": "^5.9.3",
+    "typescript": "^7.0.2",
     "vite": "^8.3.5"
   },
   "overrides": {
