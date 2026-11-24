@@ -8,7 +8,7 @@
     "azure-pipelines-task-lib": "^5.281.2"
   },
   "devDependencies": {
-    "@types/node": "^20.19.43",
+    "@types/node": "^26.6.6",
     "jszip": "^3.10.2"
   },
   "private": true,
