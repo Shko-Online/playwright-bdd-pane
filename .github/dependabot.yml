@@ -16,6 +16,11 @@ updates:
     commit-message:
       prefix: build
       include: scope
+    ignore:
+      # The pipeline task runs on the agent's Node16/Node20 handlers (task.json), so its
+      # Node typings must not describe newer APIs. Raise this with the task's runtime.
+      - dependency-name: "@types/node"
+        update-types: ["version-update:semver-major"]
     groups:
       storybook:
         patterns: ["storybook", "@storybook/*"]
